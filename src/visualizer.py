@@ -8,12 +8,17 @@ class Visualizer:
     """"""
 
     def __init__(self, cube_width: int, cube_height: int, cube_row: int,
-                 frame_color: Colors, trap_color: Colors):
+                 frame_color: Colors, current_color: Colors,
+                 trap_color: Colors, examined_color: Colors):
         self._cube_height = cube_height
         self._cube_width = cube_width
         self._cube_row = cube_row
+
         self._frame_color = frame_color.value
+        self._current_color = current_color.value
         self._trap_color = trap_color.value
+        self._examined_color = examined_color.value
+
         self._rooms = []
 
     def set_rooms(self) -> None:
@@ -66,24 +71,25 @@ class Visualizer:
 
     def draw_room(self, visualization, room_coordinates: tuple) -> None:
         """"""
-        step_height = int((self._cube_height / self._cube_row))
+        step = int((self._cube_height / self._cube_row))  # need to change
 
-        cv2.floodFill(visualization, None, seedPoint=room_coordinates, newVal=self._trap_color)
-        # cur_x = 0
-        # cur_y = 0
-        # limit = int((self._cube_width / self._cube_row))
-        # while cur_y < limit:
-        #     while cur_x < limit:
-        #         visualization[cur_x][cur_y] = self._trap_color
-        #         cur_x += 1
-        #     cur_y += 1
+        # cv2.floodFill(visualization, None, seedPoint=room_coordinates, newVal=self._trap_color)
+        cur_x = 0
+        cur_y = 0
+        limit = int((self._cube_width / self._cube_row))
+        while cur_y < limit:
+            while cur_x < limit:
+                visualization[cur_x][cur_y] = self._current_color
+                cur_x += 1
+            cur_y += 1
+            cur_x = 0
 
     def visualize(self) -> None:
         """"""
         visualization = np.zeros((self._cube_width, self._cube_height, 3), dtype='uint8')
 
         self.draw_frame(visualization)
-        self.draw_point(visualization)
+        # self.draw_point(visualization)
         self.draw_room(visualization, self._rooms[0][0])
         scale = 2
         vis_image = cv2.resize(visualization, None, fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
