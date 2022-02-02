@@ -1,12 +1,19 @@
 """"""
 from room import Room
+import random
 
 
 class Door:
     """"""
 
-    def set_numbers(self) -> None:
-        """"""
+    def __init__(self, next_room_x: int, next_room_y: int, room_trap: bool):
+        self._next_room_coordinates = next_room_x, next_room_y
 
-    def __init__(self, way_to: Room):
-        pass
+        if room_trap is True:  # temporary solution
+            self._numbers = random.randint(100, 999), random.randint(100, 999), random.randint(100, 999)
+        else:
+            self._numbers = random.randint(100, 999), random.randint(100, 999), random.randint(100, 999)
+
+    def get_next_room_coordinates(self) -> tuple:
+        """"""
+        return self._next_room_coordinates
