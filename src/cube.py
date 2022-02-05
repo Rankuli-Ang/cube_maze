@@ -1,6 +1,8 @@
 """"""
 import random
 from src.room import Room
+from src.player import Player
+from resources.steps import Steps
 
 
 class Cube:
@@ -23,6 +25,18 @@ class Cube:
         """"""
         return self._levels[level_index]
 
+    def get_room(self, level: int, row: int, room_number: int) -> Room:
+        return self._levels[level][row][room_number]
+
+    def get_random_safe_room_coords(self, cube_row: int) -> tuple:
+        search = True
+        while search:
+            level = random.randrange(0, cube_row)
+            row = random.randrange(0, cube_row)
+            room = random.randrange(0, cube_row)
+            if not self._levels[level][row][room].is_trap:
+                return level, row, room
+
     def create_rooms(self) -> None:
         """"""
         cur_level = 0
@@ -34,7 +48,7 @@ class Cube:
             while cur_y < self._row:
                 new_row = []
                 while cur_x < self._row:
-                    new_room = Room(cur_x, cur_y)
+                    new_room = Room(cur_level, cur_x, cur_y)
                     new_row.append(new_room)
                     cur_x += 1
                 new_level.append(new_row)
@@ -86,6 +100,18 @@ class Cube:
             neighbour_rooms.append(down_level_room)
         return neighbour_rooms
 
-    def add_player(self, level: int, x: int, y: int) -> None:
+    def add_player(self, level: int, x: int, y: int, player: Player) -> None:
         """Adds player in the room's list."""
-        self._levels[level][x][y].add_player()
+        self._levels[level][x][y].add_player(player)
+
+    def move_player(self, player: Player, step: Steps) -> None:
+        """"""
+        previous_room_coords = player.get_coords()
+        previous_room = self.get_room(previous_room_coords[0],
+                                      previous_room_coords[1], previous_room_coords[2])
+        player.move(step)
+        next_room_coords = player.get_coords()
+        next_room = self.get_room(next_room_coords[0],
+                                  next_room_coords[1], next_room_coords[2])
+        next_room.add_player(player)
+        previous_room.del_player(player)

@@ -3,23 +3,24 @@ import numpy as np
 import cv2
 from resources.colors import Colors
 from src.room import Room
+from src.player import Player
 
 
 class Visualizer:
     """"""
 
     def __init__(self, cube_width: int, cube_height: int, cube_row: int,
-                 frame_color: Colors, current_color: Colors,
+                 frame_color: Colors, player_color: Colors,
                  trap_color: Colors, not_examined_color: Colors, examined_color: Colors):
         self._cube_height = cube_height
         self._cube_width = cube_width
         self._cube_row = cube_row
 
         self._frame_color = frame_color.value
-        self._current_color = current_color.value
+        self._player_color = player_color.value
         self._trap_color = trap_color.value
-        self._not_examined_color = not_examined_color.value
         self._examined_color = examined_color.value
+        self._not_examined_color = not_examined_color.value
 
         self._rooms_coordinates = []
 
@@ -71,7 +72,8 @@ class Visualizer:
                 cur_counter += 1
             cur_width += step_width
 
-    def draw_room(self, visualization, room_coordinates: tuple, trap: bool) -> None:  # add examined rooms
+    def draw_room(self, visualization,
+                  room_coordinates: tuple, player: bool, trap: bool, examined: bool) -> None:  # add examined rooms
         """"""
         step = int((self._cube_height / self._cube_row))  # need to change
 
@@ -82,15 +84,21 @@ class Visualizer:
         limit_y = cur_y + int((self._cube_height / self._cube_row)) - 1
         while cur_y < limit_y:
             while cur_x < limit_x:
-                if trap:
-                    visualization[cur_y][cur_x] = self._trap_color
+                if player:
+                    visualization[cur_x][cur_y] = self._player_color
+                    print('player cords in vis', cur_x, cur_y)
+                elif trap:
+                    visualization[cur_x][cur_y] = self._trap_color
+                elif examined:
+                    visualization[cur_x][cur_y] = self._examined_color
                 else:
-                    visualization[cur_y][cur_x] = self._not_examined_color  # customize color options
+                    visualization[cur_x][cur_y] = self._not_examined_color  # customize color options
                 cur_x += 1
             cur_y += 1
             cur_x = room_coordinates[0]
 
-    def visualize(self, cube_row: int, cube_level: list) -> None:
+    def visualize(self, cube_row: int, cube_level: list,
+                  current_level_index: int, player: Player) -> None:  # create player checks - сейчас игрок передается всей визуализации
         """"""
         visualization = np.zeros((self._cube_width, self._cube_height, 3), dtype='uint8')
 
@@ -99,10 +107,12 @@ class Visualizer:
         room_number = 0
         while row_number < cube_row:
             while room_number < cube_row:
+                is_examined = cube_level[row_number][room_number].is_examined(player)
                 self.draw_room(visualization,
                                self._rooms_coordinates[row_number][room_number],
-                               cube_level[row_number][room_number].is_trap)
-                print(self._rooms_coordinates[row_number][room_number])
+                               cube_level[row_number][room_number].is_player_here,
+                               cube_level[row_number][room_number].is_trap,
+                               is_examined)
                 room_number += 1
             row_number += 1
             room_number = 0
