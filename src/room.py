@@ -1,5 +1,4 @@
 """"""
-from src.door import Door
 from src.player import Player
 
 
@@ -25,6 +24,8 @@ class Room:
     def add_player(self, player: Player) -> None:
         """Adds player to room's list."""
         self._players.append(player)
+        if not self._doors:  # need to add doors generating
+            pass
 
     def del_player(self, player: Player) -> None:
         """Deletes player from the room's list."""
@@ -46,12 +47,6 @@ class Room:
         """"""
         return self._level, self._x, self._y
 
-    def set_doors(self) -> None:
-        """"""
-        for room in self._neighbour_rooms:
-            new_door = Door(room.get_x(), room.get_y(), room.is_trap)
-            self._doors.append(new_door)
-
     @property
     def is_trap(self) -> bool:
         """Returns True if room has a trap."""
@@ -60,8 +55,12 @@ class Room:
     def is_examined(self, player: Player) -> bool:
         """Returns True if room examined by player."""
         if self.get_coords() in player.get_examined_rooms():
+            print('rm cords', self.get_coords())
+            print('exam r', player.get_examined_rooms())
             return True
         else:
+            print('rm cords', self.get_coords())
+            print('exam r', player.get_examined_rooms())
             return False
 
 

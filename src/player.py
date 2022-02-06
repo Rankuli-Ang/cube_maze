@@ -6,12 +6,12 @@ class Player:
     """"""
 
     def __init__(self, level: int, x: int, y: int):
-        self._level = level
-        self._x = x
-        self._y = y
-        self._shoes = 2
-        self._examined_rooms = []
-        self._alive = True
+        self._level: int = level
+        self._x: int = x
+        self._y: int = y
+        self._shoes: int = 2
+        self._examined_rooms: list = [(self._level, self._x, self._y)]
+        self._alive: bool = True
 
     def get_coords(self) -> tuple:
         """"""
@@ -19,7 +19,7 @@ class Player:
 
     @property
     def is_alive(self) -> bool:
-        """If Player is alive returns True, else returns False."""
+        """If Player is alive returns True."""
         return self._alive
 
     def add_examined_room(self, level: int, room_x: int, room_y: int) -> None:
@@ -43,5 +43,11 @@ class Player:
     def get_examined_rooms(self) -> list:
         """"""
         return self._examined_rooms
+
+    # def is_examined_room(self, coords: tuple) -> bool:
+    #     if coords in self._examined_rooms:
+    #         return True
+    #     else:
+    #         return False
 
 
