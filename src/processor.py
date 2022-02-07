@@ -38,11 +38,15 @@ class Processor:
                                              under_level)
 
         start_loc = self._cube.get_random_safe_room_coords(start_level)
-        print(start_loc)
         player_one = Player(start_loc[0], start_loc[1], start_loc[2])
-        self._cube.add_player_by_coords(start_loc[0], start_loc[1], start_loc[2], player_one)
         self._current_player = player_one
         self._players.append(player_one)
+
+        self._cube.add_player_by_coords(start_loc[0], start_loc[1], start_loc[2], player_one)
+        start_room = self._cube.get_room_by_cords(start_loc[0], start_loc[1], start_loc[2])
+        start_room.create_doors(
+            self._cube.get_neighbour_rooms(start_loc[0], start_loc[1], start_loc[2])
+        )
 
     def create_visualizer(self, cube_side_pxls: int,
                           frame_color: Colors, player_color: Colors,
@@ -55,21 +59,53 @@ class Processor:
                                       not_examined_color)
         self._visualizer.set_rooms()
 
+    def explore_room(self, player: Player, step: Steps) -> None:
+        """"""
+        if player.get_shoes() <= 0:
+            return
+        player.throw_a_shoe()
+        player_coords = player.get_coords()
+        neighbour_room = self._cube.get_neighbour_room_by_step(
+            player_coords[0], player_coords[1], player_coords[2], step
+        )
+        neighbour_room_coords = neighbour_room.get_coords()
+        player.add_examined_room(
+            neighbour_room_coords[0], neighbour_room_coords[1], neighbour_room_coords[2]
+        )
+
     def process(self) -> None:  # temporary test solution
         """"""
+        print(self._current_player.get_coords())
         self._visualizer.visualize(self._cube.get_level(self._current_level),
                                    self._current_player)
-        print('current cords', self._current_player.get_coords())
         step = input("next step")
         if step == '1':
             self._cube.move_player(self._current_player, Steps.UP)
-            print(self._current_player.get_coords())
+            pl_coords = self._current_player.get_coords()
+            self._current_level = pl_coords[0]
+            self._cube.get_neighbour_rooms(pl_coords[0], pl_coords[1], pl_coords[2])
         elif step == '2':
             self._cube.move_player(self._current_player, Steps.LEFT)
-            print(self._current_player.get_coords())
+            pl_coords = self._current_player.get_coords()
+            self._current_level = pl_coords[0]
+            self._cube.get_neighbour_rooms(pl_coords[0], pl_coords[1], pl_coords[2])
         elif step == '3':
             self._cube.move_player(self._current_player, Steps.RIGHT)
-            print(self._current_player.get_coords())
+            pl_coords = self._current_player.get_coords()
+            self._current_level = pl_coords[0]
+            self._cube.get_neighbour_rooms(pl_coords[0], pl_coords[1], pl_coords[2])
         elif step == '4':
             self._cube.move_player(self._current_player, Steps.DOWN)
-            print(self._current_player.get_coords())
+            pl_coords = self._current_player.get_coords()
+            self._current_level = pl_coords[0]
+            self._cube.get_neighbour_rooms(pl_coords[0], pl_coords[1], pl_coords[2])
+        elif step == '5':
+            self._cube.move_player(self._current_player, Steps.UP_LEVEL)
+            pl_coords = self._current_player.get_coords()
+            self._current_level = pl_coords[0]
+            self._cube.get_neighbour_rooms(pl_coords[0], pl_coords[1], pl_coords[2])
+        elif step == '6':
+            self._cube.move_player(self._current_player, Steps.DOWN_LEVEL)
+            pl_coords = self._current_player.get_coords()
+            self._current_level = pl_coords[0]
+            self._cube.get_neighbour_rooms(pl_coords[0], pl_coords[1], pl_coords[2])

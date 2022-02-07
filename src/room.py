@@ -1,5 +1,6 @@
 """"""
 from src.player import Player
+from resources.steps import Steps
 
 
 class Room:
@@ -10,16 +11,47 @@ class Room:
         self._x: int = x
         self._y: int = y
         self._players: list = []
-        self._doors: list = []
-        self._neighbour_rooms: list = []
+        self._doors: dict = {}
         self._trap: bool = False
         # to add types of traps
         self._exit: bool = False
+        # self._processed = False
         # resolve border rooms nuances
 
-    def add_neighbour_rooms(self, neighbour_rooms: list) -> None:
+    def get_coords(self) -> tuple:
         """"""
-        self._neighbour_rooms = neighbour_rooms
+        return self._level, self._x, self._y
+
+    def get_doors(self) -> dict:
+        """"""
+        return self._doors
+
+    @property
+    def is_player_here(self) -> bool:
+        """Returns True if player in this room."""
+        if len(self._players) > 0:
+            return True
+        else:
+            return False
+
+    @property
+    def is_trap(self) -> bool:
+        """Returns True if room has a trap."""
+        return self._trap
+
+    @property
+    def is_exit(self) -> bool:
+        """Returns True if room has an exit."""
+        return self._exit
+
+    # def process(self) -> None:
+    #     """"""
+    #     self._processed = True
+    #
+    # @property
+    # def is_processed(self) -> bool:
+    #     """"""
+    #     return self._processed
 
     def add_player(self, player: Player) -> None:
         """Adds player to room's list."""
@@ -35,23 +67,6 @@ class Room:
         """"""
         self._trap = True
 
-    def get_x(self) -> int:
-        """Returns 'x' coordinate of the room."""
-        return self._x
-
-    def get_y(self) -> int:
-        """Returns 'y' coordinate of the room."""
-        return self._y
-
-    def get_coords(self) -> tuple:
-        """"""
-        return self._level, self._x, self._y
-
-    @property
-    def is_trap(self) -> bool:
-        """Returns True if room has a trap."""
-        return self._trap
-
     def is_examined(self, player: Player) -> bool:
         """Returns True if room examined by player."""
         if self.get_coords() in player.get_examined_rooms():
@@ -59,15 +74,10 @@ class Room:
         else:
             return False
 
-    @property
-    def is_exit(self) -> bool:
-        """Returns True if room has an exit."""
-        return self._exit
-
-    @property
-    def is_player_here(self) -> bool:
-        """Returns True if player in this room."""
-        if len(self._players) > 0:
-            return True
-        else:
-            return False
+    def create_doors(self, neighbour_rooms: dict) -> None:
+        """"""
+        for neighbour in neighbour_rooms:
+            if neighbour_rooms[neighbour].is_trap:
+                self._doors[neighbour] = 'trap'  # temporary solution
+            else:
+                self._doors[neighbour] = 'no trap'

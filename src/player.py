@@ -17,6 +17,9 @@ class Player:
         """"""
         return self._level, self._x, self._y
 
+    def get_shoes(self) -> int:
+        return self._shoes
+
     @property
     def is_alive(self) -> bool:
         """If Player is alive returns True."""
@@ -29,6 +32,10 @@ class Player:
             return
         else:
             self._examined_rooms.append(examined_room)
+
+    def throw_a_shoe(self) -> None:
+        """"""
+        self._shoes -= 1
 
     def move(self, step: Steps) -> None:  # maybe return bool with alive status
         """"""
@@ -49,5 +56,7 @@ class Player:
     #         return True
     #     else:
     #         return False
+
+
 
 
