@@ -1,4 +1,6 @@
 """"""
+from src.door import Door
+from src.player import Player
 
 
 class Room:
@@ -15,13 +17,27 @@ class Room:
         self._exit = None
         # resolve border rooms nuances
 
-    def get_adjoining_rooms(self, adjoining_rooms: list) -> None:
+    def add_adjoining_rooms(self, adjoining_rooms: list) -> None:
         """"""
         self._adjoining_rooms = adjoining_rooms
 
+    def add_player(self, player: Player) -> None:
+        """Adds player to room's list."""
+        self._players.append(player)
+
+    def get_coordinate_x(self) -> int:
+        """Returns 'x' coordinate of the room."""
+        return self._coordinate_x
+
+    def get_coordinate_y(self) -> int:
+        """Returns 'y' coordinate of the room."""
+        return self._coordinate_y
+
     def set_doors(self) -> None:
         """"""
-        pass
+        for room in self._adjoining_rooms:
+            new_door = Door(room.get_coordinate_x(), room.get_coordinate_y(), room.is_trap)
+            self._doors.append(new_door)
 
     @property
     def is_trap(self) -> bool:

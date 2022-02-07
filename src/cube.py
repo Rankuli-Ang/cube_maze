@@ -9,6 +9,14 @@ class Cube:
         self._row = row
         self._levels = []
 
+    def get_row(self) -> int:
+        """Returns row value of cube."""
+        return self._row
+
+    def get_levels(self) -> list:
+        """Returns list of cube's levels."""
+        return self._levels
+
     def set_rooms(self) -> None:
         """"""
         cur_level = 0
@@ -59,3 +67,7 @@ class Cube:
             down_level_room = down_level[current_room_x][current_room_y]
             adjoining_rooms.append(down_level_room)
         return adjoining_rooms
+
+    def add_player(self, level: int, x: int, y: int) -> None:
+        """Adds player in the room's list."""
+        self._levels[level][x][y].add_player()
