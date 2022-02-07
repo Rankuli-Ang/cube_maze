@@ -1,43 +1,47 @@
 """"""
-from src.room import Room
+from resources.steps import Steps
 
 
 class Player:
     """"""
 
-    def __init__(self, level: int, coordinate_x: int, coordinate_y: int):
+    def __init__(self, level: int, x: int, y: int):
         self._level = level
-        self._coordinate_x = coordinate_x
-        self._coordinate_y = coordinate_y
+        self._x = x
+        self._y = y
         self._shoes = 2
         self._examined_rooms = []
         self._alive = True
 
+    def get_coords(self) -> tuple:
+        """"""
+        return self._level, self._x, self._y
+
     @property
     def is_alive(self) -> bool:
         """If Player is alive returns True, else returns False."""
-        if self._alive is True:
-            return True
-        else:
-            return False
+        return self._alive
 
-    def add_examined_room(self, room_coordinate_x: int, room_coordinate_y: int) -> None:
+    def add_examined_room(self, level: int, room_x: int, room_y: int) -> None:
         """"""
-        examined_room = room_coordinate_x, room_coordinate_y
+        examined_room = level, room_x, room_y
         if examined_room in self._examined_rooms:
             return
         else:
             self._examined_rooms.append(examined_room)
 
-    def move(self, next_room: Room) -> None:  # maybe return bool with alive status
+    def move(self, step: Steps) -> None:  # maybe return bool with alive status
         """"""
-        if next_room.is_trap is True:
-            self._alive = False
-            return
-        self._coordinate_x = next_room.get_coordinate_x()
-        self._coordinate_y = next_room.get_coordinate_y()
-        self.add_examined_room(next_room.get_coordinate_x(), next_room.get_coordinate_y())
+        # if next_room_trap:
+        #     self._alive = False
+        #     return
+        self._level += step.value[0]
+        self._x += step.value[1]
+        self._y += step.value[2]
+        self.add_examined_room(self._level, self._x, self._y)
 
     def get_examined_rooms(self) -> list:
         """"""
         return self._examined_rooms
+
+

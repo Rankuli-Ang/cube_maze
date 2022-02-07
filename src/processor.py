@@ -19,7 +19,8 @@ class Processor:
         new_player = Player(level, x, y)
         self._players.append(new_player)
 
-    def move_player(self) -> None:
+    def move_player(self, player: Player) -> None:
         """"""
-        pass
+
+
 

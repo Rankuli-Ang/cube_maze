@@ -1,5 +1,8 @@
 """"""
+import random
 from src.room import Room
+from src.player import Player
+from resources.steps import Steps
 
 
 class Cube:
@@ -8,6 +11,7 @@ class Cube:
     def __init__(self, row: int, difficulty: int):
         self._row = row
         self._levels = []
+        self._generated_levels_index = []
 
     def get_row(self) -> int:
         """Returns row value of cube."""
@@ -17,7 +21,23 @@ class Cube:
         """Returns list of cube's levels."""
         return self._levels
 
-    def set_rooms(self) -> None:
+    def get_level(self, level_index: int) -> list:
+        """"""
+        return self._levels[level_index]
+
+    def get_room(self, level: int, row: int, room_number: int) -> Room:
+        return self._levels[level][row][room_number]
+
+    def get_random_safe_room_coords(self, cube_row: int) -> tuple:
+        search = True
+        while search:
+            level = random.randrange(0, cube_row)
+            row = random.randrange(0, cube_row)
+            room = random.randrange(0, cube_row)
+            if not self._levels[level][row][room].is_trap:
+                return level, row, room
+
+    def create_rooms(self) -> None:
         """"""
         cur_level = 0
         cur_x = 0
@@ -28,7 +48,7 @@ class Cube:
             while cur_y < self._row:
                 new_row = []
                 while cur_x < self._row:
-                    new_room = Room(cur_x, cur_y)
+                    new_room = Room(cur_level, cur_x, cur_y)
                     new_row.append(new_room)
                     cur_x += 1
                 new_level.append(new_row)
@@ -39,35 +59,59 @@ class Cube:
             cur_y = 0
             cur_level += 1
 
-    def get_adjoining_rooms(self, current_level_index: int, current_room_x: int, current_room_y: int) -> list:
+    def create_traps_on_level(self, cube_square: int, difficulty_level: int,
+                              cube_instance_level: list, cube_instance_level_index: int) -> None:
+        """"""
+        if cube_instance_level_index in self._generated_levels_index:
+            return
+        for row in cube_instance_level:
+            for room in row:
+                trap_score = random.randrange(0, cube_square)
+                if trap_score <= difficulty_level:
+                    room.add_trap()
+        self._generated_levels_index.append(cube_instance_level_index)
+
+    def get_neighbour_rooms(self, current_level_index: int, current_room_x: int, current_room_y: int) -> list:
         """"""
         current_level = self._levels[current_level_index]
-        adjoining_rooms = []
+        neighbour_rooms = []
 
         if current_room_x > 0:
             left_room = current_level[current_room_x - 1][current_room_y]
-            adjoining_rooms.append(left_room)
+            neighbour_rooms.append(left_room)
         if current_room_x < 15:
             right_room = current_level[current_room_x + 1][current_room_y]
-            adjoining_rooms.append(right_room)
+            neighbour_rooms.append(right_room)
         if current_room_y > 0:
             upper_room = current_level[current_room_x][current_room_y - 1]
-            adjoining_rooms.append(upper_room)
+            neighbour_rooms.append(upper_room)
         if current_room_y < 15:
             down_room = current_level[current_room_x][current_room_y + 1]
-            adjoining_rooms.append(down_room)
+            neighbour_rooms.append(down_room)
 
         if current_level_index > 0:
             up_level = self._levels[current_level_index - 1]
             up_level_room = up_level[current_room_x][current_room_y]
-            adjoining_rooms.append(up_level_room)
+            neighbour_rooms.append(up_level_room)
 
         if current_level_index < 15:
             down_level = self._levels[current_level_index + 1]
             down_level_room = down_level[current_room_x][current_room_y]
-            adjoining_rooms.append(down_level_room)
-        return adjoining_rooms
+            neighbour_rooms.append(down_level_room)
+        return neighbour_rooms
 
-    def add_player(self, level: int, x: int, y: int) -> None:
+    def add_player(self, level: int, x: int, y: int, player: Player) -> None:
         """Adds player in the room's list."""
-        self._levels[level][x][y].add_player()
+        self._levels[level][x][y].add_player(player)
+
+    def move_player(self, player: Player, step: Steps) -> None:
+        """"""
+        previous_room_coords = player.get_coords()
+        previous_room = self.get_room(previous_room_coords[0],
+                                      previous_room_coords[1], previous_room_coords[2])
+        player.move(step)
+        next_room_coords = player.get_coords()
+        next_room = self.get_room(next_room_coords[0],
+                                  next_room_coords[1], next_room_coords[2])
+        next_room.add_player(player)
+        previous_room.del_player(player)
