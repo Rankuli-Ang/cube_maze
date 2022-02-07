@@ -30,8 +30,8 @@ class Cube:
         """"""
         return self._levels[level_index]
 
-    def get_room(self, level: int, row: int, room_number: int) -> Room:
-        return self._levels[level][row][room_number]
+    def get_room_by_cords(self, level: int, x: int, y: int) -> Room:
+        return self._levels[level][y][x]
 
     def get_random_level(self) -> int:
         """"""
@@ -111,18 +111,24 @@ class Cube:
             neighbour_rooms.append(down_level_room)
         return neighbour_rooms
 
-    def add_player(self, level: int, x: int, y: int, player: Player) -> None:
+    def add_player_by_coords(self, level: int, x: int, y: int, player: Player) -> None:
         """Adds player in the room's list."""
         self._levels[level][y][x].add_player(player)
 
     def move_player(self, player: Player, step: Steps) -> None:
         """"""
         previous_room_coords = player.get_coords()
-        previous_room = self.get_room(previous_room_coords[0],
-                                      previous_room_coords[1], previous_room_coords[2])
+        previous_room = self.get_room_by_cords(previous_room_coords[0], previous_room_coords[1],
+                                               previous_room_coords[2])
+        print('prev cord player', player.get_coords())
+        print('prev room coord', previous_room.get_coords())
+        print('prev room players', previous_room.is_player_here)
         player.move(step)
+        print('step', step.value)
         next_room_coords = player.get_coords()
-        next_room = self.get_room(next_room_coords[0],
-                                  next_room_coords[1], next_room_coords[2])
+        print('next cords', player.get_coords())
+        next_room = self.get_room_by_cords(next_room_coords[0], next_room_coords[1], next_room_coords[2])
         next_room.add_player(player)
+        if next_room.is_trap:
+            print('ITS A TRAP!')
         previous_room.del_player(player)

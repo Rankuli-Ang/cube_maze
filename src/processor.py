@@ -38,7 +38,9 @@ class Processor:
                                              under_level)
 
         start_loc = self._cube.get_random_safe_room_coords(start_level)
+        print(start_loc)
         player_one = Player(start_loc[0], start_loc[1], start_loc[2])
+        self._cube.add_player_by_coords(start_loc[0], start_loc[1], start_loc[2], player_one)
         self._current_player = player_one
         self._players.append(player_one)
 
@@ -57,6 +59,7 @@ class Processor:
         """"""
         self._visualizer.visualize(self._cube.get_level(self._current_level),
                                    self._current_player)
+        print('current cords', self._current_player.get_coords())
         step = input("next step")
         if step == '1':
             self._cube.move_player(self._current_player, Steps.UP)

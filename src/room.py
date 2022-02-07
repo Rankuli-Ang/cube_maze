@@ -6,15 +6,15 @@ class Room:
     """"""
 
     def __init__(self, level: int, x: int, y: int):
-        self._level = level
-        self._x = x
-        self._y = y
-        self._players = []
-        self._doors = []
-        self._neighbour_rooms = []
-        self._trap = False
+        self._level: int = level
+        self._x: int = x
+        self._y: int = y
+        self._players: list = []
+        self._doors: list = []
+        self._neighbour_rooms: list = []
+        self._trap: bool = False
         # to add types of traps
-        self._exit = False
+        self._exit: bool = False
         # resolve border rooms nuances
 
     def add_neighbour_rooms(self, neighbour_rooms: list) -> None:
@@ -55,14 +55,9 @@ class Room:
     def is_examined(self, player: Player) -> bool:
         """Returns True if room examined by player."""
         if self.get_coords() in player.get_examined_rooms():
-            print('rm cords', self.get_coords())
-            print('exam r', player.get_examined_rooms())
             return True
         else:
-            print('rm cords', self.get_coords())
-            print('exam r', player.get_examined_rooms())
             return False
-
 
     @property
     def is_exit(self) -> bool:
@@ -76,6 +71,3 @@ class Room:
             return True
         else:
             return False
-
-
-

@@ -12,16 +12,16 @@ class Visualizer:
     def __init__(self, cube_side_pxls: int, cube_row: int,
                  frame_color: Colors, player_color: Colors,
                  trap_color: Colors, examined_color: Colors, not_examined_color: Colors):
-        self._cube_side_pxls = cube_side_pxls
-        self._cube_row = cube_row
+        self._cube_side_pxls: int = cube_side_pxls
+        self._cube_row: int = cube_row
 
-        self._frame_color = frame_color.value
-        self._player_color = player_color.value
-        self._trap_color = trap_color.value
-        self._examined_color = examined_color.value
-        self._not_examined_color = not_examined_color.value
+        self._frame_color: tuple = frame_color.value
+        self._player_color: tuple = player_color.value
+        self._trap_color: tuple = trap_color.value
+        self._examined_color: tuple = examined_color.value
+        self._not_examined_color: tuple = not_examined_color.value
 
-        self._rooms_coordinates = []  # divide to levels!
+        self._rooms_coordinates: list = []
 
     def set_rooms(self) -> None:
         """"""
@@ -65,14 +65,14 @@ class Visualizer:
             cur_width += step_width
 
     def draw_room(self, visualization,
-                  room_coordinates: tuple, player: bool, trap: bool, examined: bool) -> None:  # add examined rooms
+                  room_coordinates: tuple, player: bool, trap: bool, examined: bool) -> None:
         """"""
         step = int((self._cube_side_pxls / self._cube_row))  # need to change
 
         # cv2.floodFill(visualization, None, seedPoint=room_coordinates, newVal=self._trap_color)
         cur_x = room_coordinates[1]
         cur_y = room_coordinates[0]
-        limit_x = cur_x + int((self._cube_side_pxls / self._cube_row)) - 1  # correct visualization
+        limit_x = cur_x + int((self._cube_side_pxls / self._cube_row)) - 1
         limit_y = cur_y + int((self._cube_side_pxls / self._cube_row)) - 1
         while cur_x < limit_x:
             while cur_y < limit_y:
@@ -105,7 +105,7 @@ class Visualizer:
         #     cur_x = room_coordinates[0]
 
     def visualize(self, cube_level_instance: list,
-                  player: Player) -> None:  # create player checks - сейчас игрок передается всей визуализации
+                  player: Player) -> None:
         """"""
         visualization = np.zeros((self._cube_side_pxls, self._cube_side_pxls, 3), dtype='uint8')
 
