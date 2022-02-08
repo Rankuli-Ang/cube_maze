@@ -11,13 +11,15 @@ class Visualizer:
 
     def __init__(self, cube_side_pxls: int, cube_row: int,
                  frame_color: Colors, player_color: Colors,
-                 trap_color: Colors, examined_color: Colors, not_examined_color: Colors):
+                 trap_color: Colors, exit_color: Colors,
+                 examined_color: Colors, not_examined_color: Colors):
         self._cube_side_pxls: int = cube_side_pxls
         self._cube_row: int = cube_row
 
         self._frame_color: tuple = frame_color.value
         self._player_color: tuple = player_color.value
         self._trap_color: tuple = trap_color.value
+        self._exit_color: tuple = exit_color.value
         self._examined_color: tuple = examined_color.value
         self._not_examined_color: tuple = not_examined_color.value
 

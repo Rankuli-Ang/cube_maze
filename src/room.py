@@ -19,7 +19,7 @@ class Room:
         # resolve border rooms nuances
 
     def get_coords(self) -> tuple:
-        """"""
+        """Gets room's coordinates."""
         return self._level, self._x, self._y
 
     def get_doors(self) -> dict:
@@ -43,15 +43,6 @@ class Room:
     def is_exit(self) -> bool:
         """Returns True if room has an exit."""
         return self._exit
-
-    # def process(self) -> None:
-    #     """"""
-    #     self._processed = True
-    #
-    # @property
-    # def is_processed(self) -> bool:
-    #     """"""
-    #     return self._processed
 
     def add_player(self, player: Player) -> None:
         """Adds player to room's list."""

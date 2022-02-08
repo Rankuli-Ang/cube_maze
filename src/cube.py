@@ -30,8 +30,8 @@ class Cube:
         """"""
         return self._levels[level_index]
 
-    def get_room_by_cords(self, level: int, x: int, y: int) -> Room:
-        return self._levels[level][y][x]
+    def get_room_by_cords(self, room_coords: tuple) -> Room:
+        return self._levels[room_coords[0]][room_coords[2]][room_coords[1]]
 
     def get_random_level(self) -> int:
         """"""
@@ -81,59 +81,49 @@ class Cube:
                     room.add_trap()
         self._generated_levels_index.append(cube_instance_level_index)
 
-    def get_neighbour_room_by_step(self, current_level: int,
-                                   current_x: int, current_y: int,
-                                   step: Steps) -> Room:  # update name to better one
+    def get_neighbour_room_by_step(self, current_coords: tuple, step: Steps) -> Room:  # update name to better one
         """"""
-        neighbour_level = current_level - step.value[0]
-        neighbour_x = current_x - step.value[1]
-        neighbour_y = current_y - step.value[2]
+        neighbour_level = current_coords[0] - step.value[0]
+        neighbour_x = current_coords[1] - step.value[1]
+        neighbour_y = current_coords[2] - step.value[2]
         return self._levels[neighbour_level][neighbour_y][neighbour_x]
 
-    def get_neighbour_rooms(self, current_level_index: int, current_room_number: int,
-                            current_room_row: int) -> dict:
+    def get_neighbour_rooms(self, current_coords: tuple) -> dict:
         """"""
-        current_level = self._levels[current_level_index]
+        current_level = self._levels[current_coords[0]]
         neighbour_rooms = {}
 
-        if current_room_number > 0:
-            left_room = current_level[current_room_row][current_room_number - 1]
-            print('left', left_room.get_coords())
+        if current_coords[1] > 0:
+            left_room = current_level[current_coords[2]][current_coords[1] - 1]
             neighbour_rooms[Steps.LEFT] = left_room
-        if current_room_number < 15:
-            right_room = current_level[current_room_row][current_room_number + 1]
-            print('right', right_room.get_coords())
+        if current_coords[1] < 15:
+            right_room = current_level[current_coords[2]][current_coords[1] + 1]
             neighbour_rooms[Steps.RIGHT] = right_room
-        if current_room_row > 0:
-            upper_room = current_level[current_room_row - 1][current_room_number]
-            print('upper', upper_room.get_coords())
+        if current_coords[2] > 0:
+            upper_room = current_level[current_coords[2] - 1][current_coords[1]]
             neighbour_rooms[Steps.UP] = upper_room
-        if current_room_row < 15:
-            down_room = current_level[current_room_row + 1][current_room_number]
+        if current_coords[2] < 15:
+            down_room = current_level[current_coords[2] + 1][current_coords[1]]
             neighbour_rooms[Steps.DOWN] = down_room
-            print('down', down_room.get_coords())
 
-        if current_level_index > 0:
-            up_level = self._levels[current_level_index - 1]
-            up_level_room = up_level[current_room_row][current_room_number]
+        if current_coords[0] > 0:
+            up_level = self._levels[current_coords[0] - 1]
+            up_level_room = up_level[current_coords[2]][current_coords[1]]
             neighbour_rooms[Steps.UP_LEVEL] = up_level_room
-            print('up leve', up_level_room.get_coords())
-        if current_level_index < 15:
-            down_level = self._levels[current_level_index + 1]
-            down_level_room = down_level[current_room_row][current_room_number]
+        if current_coords[0] < 15:
+            down_level = self._levels[current_coords[0] + 1]
+            down_level_room = down_level[current_coords[2]][current_coords[1]]
             neighbour_rooms[Steps.DOWN_LEVEL] = down_level_room
-            print('down level', down_level_room.get_coords())
         return neighbour_rooms
 
-    def add_player_by_coords(self, level: int, x: int, y: int, player: Player) -> None:
+    def add_player_by_coords(self, coords: tuple, player: Player) -> None:
         """Adds player in the room's list."""
-        self._levels[level][y][x].add_player(player)
+        self._levels[coords[0]][coords[2]][coords[1]].add_player(player)
 
     def move_player(self, player: Player, step: Steps) -> None:
         """"""
         previous_room_coords = player.get_coords()
-        previous_room = self.get_room_by_cords(previous_room_coords[0], previous_room_coords[1],
-                                               previous_room_coords[2])
+        previous_room = self.get_room_by_cords(previous_room_coords)
         if step == Steps.UP_LEVEL:
             double_up_level_index = previous_room_coords[0] - 2
             if double_up_level_index >= 0:
@@ -153,10 +143,7 @@ class Cube:
         player.move(step)
 
         next_room_coords = player.get_coords()
-        next_room = self.get_room_by_cords(next_room_coords[0], next_room_coords[1], next_room_coords[2])
+        next_room = self.get_room_by_cords(next_room_coords)
         next_room.add_player(player)
-        next_room.create_doors(
-            self.get_neighbour_rooms(next_room_coords[0],
-                                     next_room_coords[1], next_room_coords[2])
-        )
+        next_room.create_doors(self.get_neighbour_rooms(next_room_coords))
         previous_room.del_player(player)
