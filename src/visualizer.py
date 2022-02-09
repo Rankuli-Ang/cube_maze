@@ -9,55 +9,49 @@ from src.player import Player
 class Visualizer:
     """"""
 
-    def __init__(self, cube_width: int, cube_height: int, cube_row: int,
+    def __init__(self, cube_side_pxls: int, cube_row: int,
                  frame_color: Colors, player_color: Colors,
-                 trap_color: Colors, not_examined_color: Colors, examined_color: Colors):
-        self._cube_height = cube_height
-        self._cube_width = cube_width
-        self._cube_row = cube_row
+                 trap_color: Colors, exit_color: Colors,
+                 examined_color: Colors, not_examined_color: Colors):
+        self._cube_side_pxls: int = cube_side_pxls
+        self._cube_row: int = cube_row
 
-        self._frame_color = frame_color.value
-        self._player_color = player_color.value
-        self._trap_color = trap_color.value
-        self._examined_color = examined_color.value
-        self._not_examined_color = not_examined_color.value
+        self._frame_color: tuple = frame_color.value
+        self._player_color: tuple = player_color.value
+        self._trap_color: tuple = trap_color.value
+        self._exit_color: tuple = exit_color.value
+        self._examined_color: tuple = examined_color.value
+        self._not_examined_color: tuple = not_examined_color.value
 
-        self._rooms_coordinates = []
+        self._rooms_coordinates: list = []
 
     def set_rooms(self) -> None:
         """"""
-        step_width = int((self._cube_width / self._cube_row))
-        step_height = int((self._cube_height / self._cube_row))
-        cur_height = 0
+        step_width = int((self._cube_side_pxls / self._cube_row))
+        step_height = int((self._cube_side_pxls / self._cube_row))
+        cur_width = 0
 
-        while cur_height < self._cube_height:
-            cur_width = 0
+        while cur_width < self._cube_side_pxls:
+            cur_height = 0
             new_level = []
-            while cur_width < self._cube_width:
+            while cur_height < self._cube_side_pxls:
                 start_room_point = cur_width, cur_height
                 new_level.append(start_room_point)
-                cur_width += step_width
-            cur_height += step_height
+                cur_height += step_height
+            cur_width += step_width
             self._rooms_coordinates.append(new_level)
-
-    def draw_point(self, visualization) -> None:
-        for level in self._rooms_coordinates:
-            print(level)
-            for room in level:
-                print(room)
-                visualization[room[0]][room[1]] = self._trap_color
 
     def draw_frame(self, visualization) -> None:
         """"""
-        step_width = int((self._cube_width / self._cube_row))
-        step_height = int((self._cube_height / self._cube_row))
+        step_width = int((self._cube_side_pxls / self._cube_row))
+        step_height = int((self._cube_side_pxls / self._cube_row))
 
         """vertical frame"""
         cur_height = step_height
 
-        while cur_height < self._cube_height:
+        while cur_height < self._cube_side_pxls:
             cur_counter = 0
-            while cur_counter < self._cube_width:
+            while cur_counter < self._cube_side_pxls:
                 visualization[cur_counter][cur_height] = self._frame_color
                 cur_counter += 1
             cur_height += step_height
@@ -65,54 +59,55 @@ class Visualizer:
         """horizontal frame"""
         cur_width = step_width
 
-        while cur_width < self._cube_width:
+        while cur_width < self._cube_side_pxls:
             cur_counter = 0
-            while cur_counter < self._cube_height:
+            while cur_counter < self._cube_side_pxls:
                 visualization[cur_width][cur_counter] = self._frame_color
                 cur_counter += 1
             cur_width += step_width
 
     def draw_room(self, visualization,
-                  room_coordinates: tuple, player: bool, trap: bool, examined: bool) -> None:  # add examined rooms
+                  room_coordinates: tuple, player: bool, exit_room: bool, trap: bool, examined: bool) -> None:
         """"""
-        step = int((self._cube_height / self._cube_row))  # need to change
+        step = int((self._cube_side_pxls / self._cube_row))  # need to change
 
         # cv2.floodFill(visualization, None, seedPoint=room_coordinates, newVal=self._trap_color)
-        cur_x = room_coordinates[0]
-        cur_y = room_coordinates[1]
-        limit_x = cur_x + int((self._cube_width / self._cube_row)) - 1  # correct visualization
-        limit_y = cur_y + int((self._cube_height / self._cube_row)) - 1
-        while cur_y < limit_y:
-            while cur_x < limit_x:
+        cur_x = room_coordinates[1]
+        cur_y = room_coordinates[0]
+        limit_x = cur_x + int((self._cube_side_pxls / self._cube_row)) - 1
+        limit_y = cur_y + int((self._cube_side_pxls / self._cube_row)) - 1
+        while cur_x < limit_x:
+            while cur_y < limit_y:
                 if player:
-                    visualization[cur_x][cur_y] = self._player_color
-                    print('player cords in vis', cur_x, cur_y)
+                    visualization[cur_y][cur_x] = self._player_color
+                elif exit_room:
+                    visualization[cur_y][cur_x] = self._exit_color
                 elif trap:
-                    visualization[cur_x][cur_y] = self._trap_color
+                    visualization[cur_y][cur_x] = self._trap_color
                 elif examined:
-                    visualization[cur_x][cur_y] = self._examined_color
+                    visualization[cur_y][cur_x] = self._examined_color
                 else:
-                    visualization[cur_x][cur_y] = self._not_examined_color  # customize color options
-                cur_x += 1
-            cur_y += 1
-            cur_x = room_coordinates[0]
+                    visualization[cur_y][cur_x] = self._not_examined_color  # customize color options
+                cur_y += 1
+            cur_x += 1
+            cur_y = room_coordinates[0]
 
-    def visualize(self, cube_row: int, cube_level: list,
-                  current_level_index: int, player: Player) -> None:  # create player checks - сейчас игрок передается всей визуализации
+    def visualize(self, cube_level_instance: list,
+                  player: Player) -> None:
         """"""
-        visualization = np.zeros((self._cube_width, self._cube_height, 3), dtype='uint8')
+        visualization = np.zeros((self._cube_side_pxls, self._cube_side_pxls, 3), dtype='uint8')
 
         self.draw_frame(visualization)
         row_number = 0
         room_number = 0
-        while row_number < cube_row:
-            while room_number < cube_row:
-                is_examined = cube_level[row_number][room_number].is_examined(player)
+        while row_number < self._cube_row:
+            while room_number < self._cube_row:
                 self.draw_room(visualization,
                                self._rooms_coordinates[row_number][room_number],
-                               cube_level[row_number][room_number].is_player_here,
-                               cube_level[row_number][room_number].is_trap,
-                               is_examined)
+                               cube_level_instance[row_number][room_number].is_player_here,
+                               cube_level_instance[row_number][room_number].is_exit,
+                               cube_level_instance[row_number][room_number].is_trap,
+                               cube_level_instance[row_number][room_number].is_examined(player))
                 room_number += 1
             row_number += 1
             room_number = 0
