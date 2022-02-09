@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 import random
 from src.cube import Cube
 from src.player import Player
+from src.statistics import Statistics
 from src.visualizer import Visualizer
 from resources.colors import Colors
 from resources.steps import Steps
@@ -15,15 +16,17 @@ class Processor:
         self._cube = None
         self._visualizer = None
         self._players: list = []
-        self._current_level = None
+        self._current_level_number = None
         self._current_player = None
+        self._exit_room_coords = None
+        self._stats = None
 
     def new_game(self, cube_row: int, difficulty_level: int) -> None:  # create cube, 3 levels, player
         """"""
         self._cube = Cube(cube_row, difficulty_level)
         self._cube.create_rooms()
         start_level = self._cube.get_random_level()
-        self._current_level = start_level
+        self._current_level_number = start_level
         self._cube.create_traps_on_level(self._cube.get_difficulty(),
                                          self._cube.get_level(start_level),
                                          start_level)
@@ -48,6 +51,12 @@ class Processor:
         start_room = self._cube.get_room_by_cords(start_loc)
         start_room.create_doors(self._cube.get_neighbour_rooms(start_loc))
 
+        self._exit_room_coords = self._cube.create_exit(
+            self._cube.get_level(self._current_level_number)
+        )
+
+        self._stats = Statistics()
+
     def create_visualizer(self, cube_side_pxls: int,
                           frame_color: Colors, player_color: Colors,
                           trap_color: Colors, exit_color: Colors,
@@ -70,38 +79,38 @@ class Processor:
         )
         player.add_examined_room(neighbour_room.get_coords())
 
-    def process(self) -> None:  # temporary test solution
+    @property
+    def is_end_game(self) -> bool:
+        """Returns True if exit_room and player has the same coordinates."""
+        if not self._players[0].get_coords() == self._exit_room_coords:
+            return False
+        else:
+            return True
+
+    def end_game(self) -> None:
         """"""
-        self._visualizer.visualize(self._cube.get_level(self._current_level),
+        self._stats.get_results()
+
+    def process(self) -> bool:  # temporary test solution
+        """"""
+        self._visualizer.visualize(self._cube.get_level(self._current_level_number),
                                    self._current_player)
         step = input("next step")
         if step == '1':
             self._cube.move_player(self._current_player, Steps.UP)
-            pl_coords = self._current_player.get_coords()
-            self._current_level = pl_coords[0]
-            self._cube.get_neighbour_rooms(pl_coords)
         elif step == '2':
             self._cube.move_player(self._current_player, Steps.LEFT)
-            pl_coords = self._current_player.get_coords()
-            self._current_level = pl_coords[0]
-            self._cube.get_neighbour_rooms(pl_coords)
         elif step == '3':
             self._cube.move_player(self._current_player, Steps.RIGHT)
-            pl_coords = self._current_player.get_coords()
-            self._current_level = pl_coords[0]
-            self._cube.get_neighbour_rooms(pl_coords)
         elif step == '4':
             self._cube.move_player(self._current_player, Steps.DOWN)
-            pl_coords = self._current_player.get_coords()
-            self._current_level = pl_coords[0]
-            self._cube.get_neighbour_rooms(pl_coords)
         elif step == '5':
             self._cube.move_player(self._current_player, Steps.UP_LEVEL)
-            pl_coords = self._current_player.get_coords()
-            self._current_level = pl_coords[0]
-            self._cube.get_neighbour_rooms(pl_coords)
         elif step == '6':
             self._cube.move_player(self._current_player, Steps.DOWN_LEVEL)
-            pl_coords = self._current_player.get_coords()
-            self._current_level = pl_coords[0]
-            self._cube.get_neighbour_rooms(pl_coords)
+
+        self._stats.add_step()
+        pl_coords = self._current_player.get_coords()
+        self._current_level_number = pl_coords[0]
+        self._cube.get_neighbour_rooms(pl_coords)
+        return self.is_end_game

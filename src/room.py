@@ -54,9 +54,13 @@ class Room:
         """Deletes player from the room's list."""
         self._players.remove(player)
 
-    def add_trap(self) -> None:
-        """"""
+    def add_trap(self) -> None:  # add types of traps
+        """Sets room._trap to True."""
         self._trap = True
+
+    def set_exit(self) -> None:
+        """Sets room._exit to True."""
+        self._exit = True
 
     def is_examined(self, player: Player) -> bool:
         """Returns True if room examined by player."""

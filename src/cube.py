@@ -81,6 +81,22 @@ class Cube:
                     room.add_trap()
         self._generated_levels_index.append(cube_instance_level_index)
 
+    def create_exit(self, temporary_player_level_instance: list) -> tuple:
+        """Creates exit in random border room and returns its coordinates."""
+        potential_rooms = []
+        for row in temporary_player_level_instance:
+            for room in row:
+                if not room.is_trap:
+                    room_coords = room.get_coords()
+                    if room_coords[1] == self._row - 1 or room_coords[1] == 0:
+                        potential_rooms.append(room)
+                    if room_coords[2] == self._row - 1 or room_coords[2] == 0:
+                        potential_rooms.append(room)
+
+        exit_room = random.choice(potential_rooms)
+        exit_room.set_exit()
+        return exit_room.get_coords()
+
     def get_neighbour_room_by_step(self, current_coords: tuple, step: Steps) -> Room:  # update name to better one
         """"""
         neighbour_level = current_coords[0] - step.value[0]

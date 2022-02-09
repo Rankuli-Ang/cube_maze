@@ -67,7 +67,7 @@ class Visualizer:
             cur_width += step_width
 
     def draw_room(self, visualization,
-                  room_coordinates: tuple, player: bool, trap: bool, examined: bool) -> None:
+                  room_coordinates: tuple, player: bool, exit_room: bool, trap: bool, examined: bool) -> None:
         """"""
         step = int((self._cube_side_pxls / self._cube_row))  # need to change
 
@@ -80,6 +80,8 @@ class Visualizer:
             while cur_y < limit_y:
                 if player:
                     visualization[cur_y][cur_x] = self._player_color
+                elif exit_room:
+                    visualization[cur_y][cur_x] = self._exit_color
                 elif trap:
                     visualization[cur_y][cur_x] = self._trap_color
                 elif examined:
@@ -103,6 +105,7 @@ class Visualizer:
                 self.draw_room(visualization,
                                self._rooms_coordinates[row_number][room_number],
                                cube_level_instance[row_number][room_number].is_player_here,
+                               cube_level_instance[row_number][room_number].is_exit,
                                cube_level_instance[row_number][room_number].is_trap,
                                cube_level_instance[row_number][room_number].is_examined(player))
                 room_number += 1

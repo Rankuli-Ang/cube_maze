@@ -19,3 +19,8 @@ class NewGameDB:
         player INT, level INT, x INT, y INT, trap INT
         ''')
         con.commit()
+        cur.execute('''CREATE TABLE statistics( 
+        stat_id INT PRIMARY KEY, steps INT
+        ''')
+        con.commit()
+
