@@ -1,25 +1,35 @@
-""""""
+"""Contains class Player - main active character."""
 from resources.steps import Steps
 
 
 class Player:
-    """Main game character class."""
+    """Main active game character class.
+    Player travel the cube moves from room to room,
+    if room has a trap, player dies.
+    Player's aim is to find exit room.
+    Player has attributes:
+    coordinates(level, x, y), a certain amount of shoes,
+    list of coordinates examined rooms
+    and alive bool status.
+    """
 
     def __init__(self, level: int, x: int, y: int):
-        self._level: int = level
-        self._x: int = x
-        self._y: int = y
+        self._coords: tuple = level, x, y
         self._shoes: int = 2
-        self._examined_rooms: list = [(self._level, self._x, self._y)]
+        self._examined_rooms: list = [self._coords]
         self._alive: bool = True
 
     def get_coords(self) -> tuple:
-        """Returns player's coordinates."""
-        return self._level, self._x, self._y
+        """Returns player's coordinates(level, x, y)."""
+        return self._coords
 
     def get_shoes(self) -> int:
         """Gets number of shoes a player has."""
         return self._shoes
+
+    def get_examined_rooms(self) -> list:
+        """Gets list of examined by player rooms."""
+        return self._examined_rooms
 
     @property
     def is_alive(self) -> bool:
@@ -41,14 +51,11 @@ class Player:
 
     def move(self, step: Steps) -> None:
         """Changes the player's coordinates to the step value."""
-        self._level += step.value[0]
-        self._x += step.value[1]
-        self._y += step.value[2]
+        self._coords[0] += step.value[0]
+        self._coords[1] += step.value[1]
+        self._coords[2] += step.value[2]
         self.add_examined_room(self.get_coords())
 
-    def get_examined_rooms(self) -> list:
-        """"""
-        return self._examined_rooms
 
 
 
