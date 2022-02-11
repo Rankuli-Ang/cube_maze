@@ -31,7 +31,4 @@ proc.create_visualizer(CUBE_SIDE_PXLS, Colors.FRAME_COLOR,
 # proc.end_game()
 app = Flask(__name__)
 
-
-@app.route("/")
-def hello_world():
-    return "<p>Hello, World!</p>"
+from .web import routes

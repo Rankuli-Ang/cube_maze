@@ -104,7 +104,7 @@ class Cube:
         neighbour_y = current_coords[2] - step.value[2]
         return self._levels[neighbour_level][neighbour_y][neighbour_x]
 
-    def get_neighbour_rooms(self, current_coords: tuple) -> dict:
+    def get_neighbour_rooms(self, current_coords: tuple) -> dict:  # need to fix
         """"""
         current_level = self._levels[current_coords[0]]
         neighbour_rooms = {}
