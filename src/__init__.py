@@ -24,11 +24,8 @@ proc.create_visualizer(CUBE_SIDE_PXLS, Colors.FRAME_COLOR,
                        Colors.EXIT_COLOR,
                        Colors.EXAMINED_COLOR, Colors.NOT_EXAMINED_COLOR)
 
-# end_game = False
-# while not end_game:
-#     end_game = proc.process()
-#
-# proc.end_game()
-app = Flask(__name__)
+# proc.process()
 
-from .web import routes
+
+app = Flask(__name__, template_folder='web/templates')
+

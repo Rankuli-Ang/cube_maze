@@ -1,10 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<!doctype html>
+{% extends 'base.html' %}
 
-</body>
-</html>
+{% block title%}
+  Game
+{% endblock%}
+
+{% block content%}
+    <h1>Cube game here soon...</h1>
+    <p>row: {{ cube_row }}</p>
+    <p>difficult: {{ difficulty_level }}</p>
+    <table class="table table-hover table-dark">
+      <thead>
+        <tr>
+
+          <th scope="col">coords</th>
+          <th scope="col">shoes</th>
+          <th scope="col">rooms</th>
+          <th scope="col">alive</th>
+          <th scope="col">options</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr>
+            <td> {{ coords }}</td>
+            <td> {{ shoes }}</td>
+            <td> {{ rooms }}</td>
+            <td> {{ alive }}</td>
+            <td>
+              <button class="btn btn-outline btn-info">Throw shoe</button>
+              <button class="btn btn-outline btn-success">Step</button>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+{% endblock%}

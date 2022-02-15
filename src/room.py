@@ -6,19 +6,19 @@ from resources.steps import Steps
 import random
 
 
-prime_numbers_raw = open(r'prime_numbers.txt')  # temporary place
-prime_numbers_raw = prime_numbers_raw.read().split()
-prime_numbers = []
-for prime_number in prime_numbers_raw:
-    new_number = int(prime_number)
-    prime_numbers.append(new_number)
-
-counter = 0
-not_prime_numbers = []
-while counter < 1000:
-    counter += 1
-    if counter not in prime_numbers:
-        not_prime_numbers.append(counter)
+# prime_numbers_raw = open(r'prime_numbers.txt')  # temporary place
+# prime_numbers_raw = prime_numbers_raw.read().split()
+# prime_numbers = []
+# for prime_number in prime_numbers_raw:
+#     new_number = int(prime_number)
+#     prime_numbers.append(new_number)
+#
+# counter = 0
+# not_prime_numbers = []
+# while counter < 1000:
+#     counter += 1
+#     if counter not in prime_numbers:
+#         not_prime_numbers.append(counter)
 
 
 class Room:
@@ -85,29 +85,29 @@ class Room:
         else:
             return False
 
-    def create_doors(self, neighbour_rooms: dict) -> None:  # doubtful design, fix later
-        """Adds to self._doors pairs Steps(key) - tuple of three numbers(value).
-        If neighbour room (with a Steps coord shift) has a trap -
-        from 1 to 3 of the numbers is prime."""
-        for neighbour in neighbour_rooms:
-            if neighbour_rooms[neighbour].is_trap:
-
-                prime_amount = random.randint(1, 3)
-                counter = 1
-                door_numbers = []
-                while counter <= prime_amount:
-                    door_numbers.append(random.choice(prime_numbers))
-                    counter += 1
-                while len(door_numbers) < 3:
-                    door_numbers.append(random.choice(not_prime_numbers))
-                random.shuffle(door_numbers)
-                self._doors[neighbour] = (
-                    door_numbers[0], door_numbers[1],
-                    door_numbers[2]
-                )
-            else:
-                self._doors[neighbour] = (
-                    random.choice(not_prime_numbers),
-                    random.choice(not_prime_numbers),
-                    random.choice(not_prime_numbers)
-                )
+    # def create_doors(self, neighbour_rooms: dict) -> None:  # doubtful design, fix later
+    #     """Adds to self._doors pairs Steps(key) - tuple of three numbers(value).
+    #     If neighbour room (with a Steps coord shift) has a trap -
+    #     from 1 to 3 of the numbers is prime."""
+    #     for neighbour in neighbour_rooms:
+    #         if neighbour_rooms[neighbour].is_trap:
+    #
+    #             prime_amount = random.randint(1, 3)
+    #             counter = 1
+    #             door_numbers = []
+    #             while counter <= prime_amount:
+    #                 door_numbers.append(random.choice(prime_numbers))
+    #                 counter += 1
+    #             while len(door_numbers) < 3:
+    #                 door_numbers.append(random.choice(not_prime_numbers))
+    #             random.shuffle(door_numbers)
+    #             self._doors[neighbour] = (
+    #                 door_numbers[0], door_numbers[1],
+    #                 door_numbers[2]
+    #             )
+    #         else:
+    #             self._doors[neighbour] = (
+    #                 random.choice(not_prime_numbers),
+    #                 random.choice(not_prime_numbers),
+    #                 random.choice(not_prime_numbers)
+    #             )

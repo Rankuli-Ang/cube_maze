@@ -49,7 +49,7 @@ class Processor:
 
         self._cube.add_player_by_coords(start_loc, player_one)
         start_room = self._cube.get_room_by_cords(start_loc)
-        start_room.create_doors(self._cube.get_neighbour_rooms(start_loc))
+        # start_room.create_doors(self._cube.get_neighbour_rooms(start_loc))
 
         self._exit_room_coords = self._cube.create_exit(
             self._cube.get_level(self._current_level_number)
@@ -91,26 +91,30 @@ class Processor:
         """"""
         self._stats.get_results()
 
-    def process(self) -> bool:  # temporary test solution
+    def get_player(self):
+        return self._players[0]
+
+    def process(self) -> None:  # temporary test solution
         """"""
         self._visualizer.visualize(self._cube.get_level(self._current_level_number),
                                    self._current_player)
-        step = input("next step")
-        if step == '1':
-            self._cube.move_player(self._current_player, Steps.UP)
-        elif step == '2':
-            self._cube.move_player(self._current_player, Steps.LEFT)
-        elif step == '3':
-            self._cube.move_player(self._current_player, Steps.RIGHT)
-        elif step == '4':
-            self._cube.move_player(self._current_player, Steps.DOWN)
-        elif step == '5':
-            self._cube.move_player(self._current_player, Steps.UP_LEVEL)
-        elif step == '6':
-            self._cube.move_player(self._current_player, Steps.DOWN_LEVEL)
 
-        self._stats.add_step()
-        pl_coords = self._current_player.get_coords()
-        self._current_level_number = pl_coords[0]
-        self._cube.get_neighbour_rooms(pl_coords)
-        return self.is_end_game
+        # step = input("next step")
+        # if step == '1':
+        #     self._cube.move_player(self._current_player, Steps.UP)
+        # elif step == '2':
+        #     self._cube.move_player(self._current_player, Steps.LEFT)
+        # elif step == '3':
+        #     self._cube.move_player(self._current_player, Steps.RIGHT)
+        # elif step == '4':
+        #     self._cube.move_player(self._current_player, Steps.DOWN)
+        # elif step == '5':
+        #     self._cube.move_player(self._current_player, Steps.UP_LEVEL)
+        # elif step == '6':
+        #     self._cube.move_player(self._current_player, Steps.DOWN_LEVEL)
+        #
+        # self._stats.add_step()
+        # pl_coords = self._current_player.get_coords()
+        # self._current_level_number = pl_coords[0]
+        # self._cube.get_neighbour_rooms(pl_coords)
+        # return self.is_end_game

@@ -31,6 +31,16 @@ class Player:
         """Gets list of examined by player rooms."""
         return self._examined_rooms
 
+    def get_stats(self) -> list:  # test function
+        """Gets all stats of player"""
+        stats = []
+        stats.append(self.get_coords())
+        stats.append(self._shoes)
+        stats.append(self._examined_rooms)
+        stats.append(self._alive)
+
+        return stats
+
     @property
     def is_alive(self) -> bool:
         """If Player is alive returns True."""
