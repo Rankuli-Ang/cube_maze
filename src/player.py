@@ -18,6 +18,11 @@ class Player:
         self._shoes: int = 2
         self._examined_rooms: list = [self._coords]
         self._alive: bool = True
+        self._stats: dict = {
+            "coords": self._coords,
+            "shoes": self._shoes,
+            "examined_rooms": self._examined_rooms,
+        }  # add alive status ???
 
     def get_coords(self) -> tuple:
         """Returns player's coordinates(level, x, y)."""
@@ -31,14 +36,17 @@ class Player:
         """Gets list of examined by player rooms."""
         return self._examined_rooms
 
-    def get_stats(self) -> list:  # test function
+    def get_stats(self) -> dict:
+        """Gets player's stats in dict(without alive status)."""
+        return self._stats
+
+    def test_get_stats(self) -> list:  # test function
         """Gets all stats of player"""
         stats = []
         stats.append(self.get_coords())
         stats.append(self._shoes)
         stats.append(self._examined_rooms)
         stats.append(self._alive)
-
         return stats
 
     @property
