@@ -113,5 +113,6 @@ class Visualizer:
             room_number = 0
         scale = 2
         vis_image = cv2.resize(visualization, None, fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
+        cv2.imwrite('vis.png', vis_image)  # fix for more images
         cv2.imshow('vis', vis_image)
         cv2.waitKey()

@@ -1,8 +1,9 @@
-from src import app
-
+""""""
+import src
+from src.web import routes
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    src.app.run(debug=True)
 
 
 
