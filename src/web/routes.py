@@ -1,27 +1,29 @@
-import src
 from flask import render_template
-import cv2
+from src import app, proc, CUBE_ROW, CUBE_SIDE_PXLS, \
+    DIFFICULTY_LEVEL
+from resources.colors import Colors
 
 
-@src.app.route("/")
-def home_page():
+@app.route("/")
+def new_game():  # temporary solution
+    proc.new_game(CUBE_ROW, DIFFICULTY_LEVEL)
+    proc.create_visualizer(CUBE_SIDE_PXLS, Colors.FRAME_COLOR,
+                           Colors.PLAYER_COLOR, Colors.TRAP_COLOR,
+                           Colors.EXIT_COLOR,
+                           Colors.EXAMINED_COLOR, Colors.NOT_EXAMINED_COLOR)
     return render_template('home.html')
 
 
-@src.app.route("/game")
+@app.route("/game")
 def game_page():
-    player_stats = src.proc.get_player().test_get_stats()
-    return render_template('game.html',
-                           cube_row=src.CUBE_ROW, difficulty_level=src.DIFFICULTY_LEVEL,
-                           coords=player_stats[0], shoes=player_stats[1],
-                           rooms=player_stats[2], alive=player_stats[3])
+    return render_template('game.html')
 
 
-@src.app.route("/login")
+@app.route("/login")
 def login_page():
     return render_template('login.html')
 
 
-@src.app.route("/registration")
+@app.route("/registration")
 def registration_page():
     return render_template('registration.html')
