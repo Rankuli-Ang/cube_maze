@@ -1,31 +1,27 @@
 """Contains class Room -
-is the point of the cube
+is the cell of the cube
 on which the player moves."""
+import random
+from typing import List
 from src.player import Player
 from resources.steps import Steps
-import random
-
-
-# prime_numbers_raw = open(r'prime_numbers.txt')  # temporary place
-# prime_numbers_raw = prime_numbers_raw.read().split()
-# prime_numbers = []
-# for prime_number in prime_numbers_raw:
-#     new_number = int(prime_number)
-#     prime_numbers.append(new_number)
-#
-# counter = 0
-# not_prime_numbers = []
-# while counter < 1000:
-#     counter += 1
-#     if counter not in prime_numbers:
-#         not_prime_numbers.append(counter)
+from resources.door_numbers import get_prime_numbers, get_non_prime_numbers
 
 
 class Room:
-    """"""
+    """Cell unit of the cube.
+    Room may contains trap or exit or nothing.
+    If player comes into the room with a trap - he dies ang game over,
+    with an exit - player wins.
+    Room has attributes:
+    -coords tuple(level, x, y),
+    -list of players in the room,
+    trap and exit presence - bool."""
 
-    def __init__(self, level: int, x: int, y: int):
-        self._coords: tuple = level, x, y
+    def __init__(self, coords: tuple):
+        """Creates room instance with a given coords(level, x, y),
+        trap, exit, and doors creates separately."""
+        self._coords: tuple = coords[0], coords[1], coords[2]
         self._players: list = []
         self._doors: dict = {}
         self._trap: bool = False
@@ -35,7 +31,7 @@ class Room:
         # resolve border rooms nuances
 
     def get_coords(self) -> tuple:
-        """Gets room's coordinates."""
+        """Gets room's coordinates in tuple(level, x, y)."""
         return self._coords
 
     def get_doors(self) -> dict:
@@ -78,36 +74,46 @@ class Room:
         """Sets room._exit to True."""
         self._exit = True
 
-    def is_examined(self, player: Player) -> bool:
+    def is_examined(self, player: Player) -> bool:  # change after add mixing room func
         """Returns True if room examined by player."""
         if self.get_coords() in player.get_examined_rooms():
             return True
         else:
             return False
 
-    # def create_doors(self, neighbour_rooms: dict) -> None:  # doubtful design, fix later
-    #     """Adds to self._doors pairs Steps(key) - tuple of three numbers(value).
-    #     If neighbour room (with a Steps coord shift) has a trap -
-    #     from 1 to 3 of the numbers is prime."""
-    #     for neighbour in neighbour_rooms:
-    #         if neighbour_rooms[neighbour].is_trap:
-    #
-    #             prime_amount = random.randint(1, 3)
-    #             counter = 1
-    #             door_numbers = []
-    #             while counter <= prime_amount:
-    #                 door_numbers.append(random.choice(prime_numbers))
-    #                 counter += 1
-    #             while len(door_numbers) < 3:
-    #                 door_numbers.append(random.choice(not_prime_numbers))
-    #             random.shuffle(door_numbers)
-    #             self._doors[neighbour] = (
-    #                 door_numbers[0], door_numbers[1],
-    #                 door_numbers[2]
-    #             )
-    #         else:
-    #             self._doors[neighbour] = (
-    #                 random.choice(not_prime_numbers),
-    #                 random.choice(not_prime_numbers),
-    #                 random.choice(not_prime_numbers)
-    #             )
+    def create_doors(self, neighbour_rooms_is_trap: dict,
+                     prime_numbers: List[int], non_prime_numbers: List[int]) -> None:
+        """Adds to self._doors pairs Steps(key) - tuple of three numbers(value).
+        If neighbour room (with a Steps coord shift) has a trap -
+        from 1 to 3 of the numbers is prime."""
+        for neighbour in neighbour_rooms_is_trap:
+            if neighbour_rooms_is_trap[neighbour]:
+
+                prime_numbers_amount = random.randint(1, 3)
+                counter = 1
+                door_numbers = []
+                while counter <= prime_numbers_amount:
+                    door_numbers.append(random.choice(prime_numbers))
+                    counter += 1
+                while len(door_numbers) < 3:
+                    door_numbers.append(random.choice(non_prime_numbers))
+
+                random.shuffle(door_numbers)
+                self._doors[neighbour] = (
+                    door_numbers[0], door_numbers[1],
+                    door_numbers[2]
+                )
+            else:
+                self._doors[neighbour] = (
+                    random.choice(non_prime_numbers),
+                    random.choice(non_prime_numbers),
+                    random.choice(non_prime_numbers)
+                )
+
+
+# rm = Room((5, 5, 5))
+# prime_numbers = get_prime_numbers()
+# non = get_non_prime_numbers(prime_numbers)
+# nhbrs = {Steps.UP: True, Steps.DOWN: False, Steps.RIGHT: False, Steps.LEFT: True}
+# rm.create_doors(nhbrs, prime_numbers, non)
+# print(rm.get_doors())

@@ -12,7 +12,8 @@ class Cube:
         self._row: int = row
         self._difficulty: int = difficulty
         self._levels: list = []
-        self._generated_levels_index: list = []
+        self._generated_levels_indexes: list = []
+        self._square = self._row * self._row
 
     def get_row(self) -> int:
         """Returns row value of cube."""
@@ -33,17 +34,18 @@ class Cube:
     def get_room_by_cords(self, room_coords: tuple) -> Room:
         return self._levels[room_coords[0]][room_coords[2]][room_coords[1]]
 
-    def get_random_level(self) -> int:
+    def get_random_level_index(self) -> int:
         """"""
         return random.randrange(0, self._row)
 
-    def get_random_safe_room_coords(self, current_level: int) -> tuple:  # correct
+    def get_random_safe_room_coords(self, current_level_index: int) -> tuple:
+        """Gets random safe coords in the level with a given level index."""
         search = True
         while search:
             row = random.randrange(0, self._row)
             room = random.randrange(0, self._row)
-            if not self._levels[current_level][row][room].is_trap:
-                return current_level, room, row
+            if not self._levels[current_level_index][row][room].is_trap:
+                return current_level_index, room, row
 
     def create_rooms(self) -> None:
         """"""
@@ -67,19 +69,36 @@ class Cube:
             cur_y = 0
             cur_level += 1
 
-    def create_traps_on_level(self, difficulty_level: int,
-                              cube_instance_level: list, cube_instance_level_index: int) -> None:
-        """"""
-        if cube_instance_level_index in self._generated_levels_index:
+    def create_traps_on_level(self, cube_level: list,
+                              cube_level_index: int) -> None:
+        """Creates traps in the given level
+        with probability depending on difficulty."""
+        if cube_level_index in self._generated_levels_indexes:
             return
 
-        cube_square = self._row * self._row
-        for row in cube_instance_level:
+        for row in cube_level:
             for room in row:
-                trap_score = random.randrange(0, cube_square)
-                if trap_score <= difficulty_level:
+                trap_score = random.randrange(0, self._square)
+                if trap_score <= self._difficulty:
                     room.add_trap()
-        self._generated_levels_index.append(cube_instance_level_index)
+        self._generated_levels_indexes.append(cube_level_index)
+
+    def create_traps_around_start_loc(self, start_level_index: int) -> None:
+        """Creates trap in the start level,
+         if the start level index != 0 in the upper level
+         and if the start level index < _row - 1
+         creates traps in the under level."""
+        self.create_traps_on_level(self.get_level(start_level_index),
+                                   start_level_index)
+        if start_level_index > 0:
+            upper_level_index = start_level_index - 1
+            self.create_traps_on_level(self.get_level(upper_level_index),
+                                       upper_level_index)
+
+        if start_level_index < self._row - 1:
+            under_level_index = start_level_index + 1
+            self.create_traps_on_level(self.get_level(under_level_index),
+                                       under_level_index)
 
     def create_exit(self, temporary_player_level_instance: list) -> tuple:
         """Creates exit in random border room and returns its coordinates."""
@@ -104,7 +123,7 @@ class Cube:
         neighbour_y = current_coords[2] - step.value[2]
         return self._levels[neighbour_level][neighbour_y][neighbour_x]
 
-    def get_neighbour_rooms(self, current_coords: tuple) -> dict:  # need to fix
+    def get_neighbour_rooms(self, current_coords: tuple) -> dict:  # need to fix, add with a bool version
         """"""
         current_level = self._levels[current_coords[0]]
         neighbour_rooms = {}
@@ -143,7 +162,7 @@ class Cube:
         if step == Steps.UP_LEVEL:
             double_up_level_index = previous_room_coords[0] - 2
             if double_up_level_index >= 0:
-                if double_up_level_index not in self._generated_levels_index:
+                if double_up_level_index not in self._generated_levels_indexes:
                     self.create_traps_on_level(self._difficulty,
                                                self._levels[double_up_level_index],
                                                double_up_level_index)
@@ -151,7 +170,7 @@ class Cube:
         if step == Steps.DOWN_LEVEL:
             double_down_level_index = previous_room_coords[0] - 2
             if double_down_level_index <= 15:
-                if double_down_level_index not in self._generated_levels_index:
+                if double_down_level_index not in self._generated_levels_indexes:
                     self.create_traps_on_level(self._difficulty,
                                                self._levels[double_down_level_index],
                                                double_down_level_index)
@@ -161,5 +180,5 @@ class Cube:
         next_room_coords = player.get_coords()
         next_room = self.get_room_by_cords(next_room_coords)
         next_room.add_player(player)
-        next_room.create_doors(self.get_neighbour_rooms(next_room_coords))
+        next_room.create_doors(self.get_neighbour_rooms(next_room_coords),,
         previous_room.del_player(player)

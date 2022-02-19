@@ -20,27 +20,35 @@ class Processor:
         self._current_player = None
         self._exit_room_coords = None
         self._stats = None
+        self._is_activated = False
 
-    def new_game(self, cube_row: int, difficulty_level: int) -> None:  # create cube, 3 levels, player
+    def activate(self) -> None:
+        """Changes is_activated status to True."""
+        self._is_activated = True
+
+    def create_visualizer(self, cube_side_pxls: int,
+                          frame_color: Colors, player_color: Colors,
+                          trap_color: Colors, exit_color: Colors,
+                          examined_color: Colors, not_examined_color: Colors) -> None:
+        """"""
+        self._visualizer = Visualizer(cube_side_pxls, self._cube.get_row(),
+                                      frame_color, player_color,
+                                      trap_color, exit_color,
+                                      examined_color, not_examined_color)
+        self._visualizer.set_rooms()
+
+    def new_game(
+            self, cube_row: int, difficulty_level: int, cube_side_pxls: int,
+            frame_color: Colors, player_color: Colors, trap_color: Colors,
+            exit_color: Colors, examined_color: Colors, not_examined_color: Colors
+    ) -> None:  # create cube, 3 levels, player
+        # i doubt the design of this function
         """"""
         self._cube = Cube(cube_row, difficulty_level)
         self._cube.create_rooms()
-        start_level = self._cube.get_random_level()
-        self._current_level_number = start_level
-        self._cube.create_traps_on_level(self._cube.get_difficulty(),
-                                         self._cube.get_level(start_level),
-                                         start_level)
-        if start_level > 0:
-            upper_level = start_level - 1
-            self._cube.create_traps_on_level(self._cube.get_difficulty(),
-                                             self._cube.get_level(upper_level),
-                                             upper_level)
-
-        if start_level < self._cube.get_row() - 1:
-            under_level = start_level + 1
-            self._cube.create_traps_on_level(self._cube.get_difficulty(),
-                                             self._cube.get_level(under_level),
-                                             under_level)
+        start_level_index = self._cube.get_random_level_index()
+        self._current_level_number = start_level_index
+        self._cube.create_traps_around_start_loc(start_level_index)
 
         start_loc = self._cube.get_random_safe_room_coords(start_level)
         player_one = Player(start_loc[0], start_loc[1], start_loc[2])
@@ -56,28 +64,23 @@ class Processor:
         )
 
         self._stats = Statistics()
-
-    def create_visualizer(self, cube_side_pxls: int,
-                          frame_color: Colors, player_color: Colors,
-                          trap_color: Colors, exit_color: Colors,
-                          examined_color: Colors, not_examined_color: Colors) -> None:
-        """"""
-        self._visualizer = Visualizer(cube_side_pxls, self._cube.get_row(),
-                                      frame_color, player_color,
-                                      trap_color, exit_color,
-                                      examined_color, not_examined_color)
-        self._visualizer.set_rooms()
-
-    def explore_room(self, player: Player, step: Steps) -> None:
-        """"""
-        if player.get_shoes() <= 0:
-            return
-        player.throw_a_shoe()
-        player_coords = player.get_coords()
-        neighbour_room = self._cube.get_neighbour_room_by_step(
-            player_coords[0], player_coords[1], player_coords[2], step
+        self.create_visualizer(
+            cube_side_pxls, frame_color, player_color,
+            trap_color, exit_color, examined_color, not_examined_color
         )
-        player.add_examined_room(neighbour_room.get_coords())
+        self.activate()
+
+    # def explore_room(self, player: Player, step: Steps) -> None:
+    #     """"""
+    #     if player.get_shoes() <= 0:
+    #         return
+    #     player_coords = player.get_coords()
+    #     neighbour_room = self._cube.get_neighbour_room_by_step(
+    #         player_coords[0], player_coords[1], player_coords[2], step
+    #     )
+    #     if neighbour_room.is_trap:
+    #         player.lose_a_shoe()
+    #     player.add_examined_room(neighbour_room.get_coords())
 
     @property
     def is_end_game(self) -> bool:
