@@ -4,8 +4,6 @@ on which the player moves."""
 import random
 from typing import List
 from src.player import Player
-from resources.steps import Steps
-from resources.door_numbers import get_prime_numbers, get_non_prime_numbers
 
 
 class Room:
@@ -81,39 +79,25 @@ class Room:
         else:
             return False
 
-    def create_doors(self, neighbour_rooms_is_trap: dict,
+    def create_doors(self, neighbour_rooms_is_trap: dict, door_numbers_amount: int,
+                     min_prime_numbers: int, max_prime_numbers: int,
                      prime_numbers: List[int], non_prime_numbers: List[int]) -> None:
         """Adds to self._doors pairs Steps(key) - tuple of three numbers(value).
         If neighbour room (with a Steps coord shift) has a trap -
         from 1 to 3 of the numbers is prime."""
         for neighbour in neighbour_rooms_is_trap:
-            if neighbour_rooms_is_trap[neighbour]:
-
-                prime_numbers_amount = random.randint(1, 3)
-                counter = 1
-                door_numbers = []
-                while counter <= prime_numbers_amount:
-                    door_numbers.append(random.choice(prime_numbers))
-                    counter += 1
-                while len(door_numbers) < 3:
-                    door_numbers.append(random.choice(non_prime_numbers))
-
-                random.shuffle(door_numbers)
-                self._doors[neighbour] = (
-                    door_numbers[0], door_numbers[1],
-                    door_numbers[2]
-                )
-            else:
-                self._doors[neighbour] = (
-                    random.choice(non_prime_numbers),
-                    random.choice(non_prime_numbers),
+            if not neighbour_rooms_is_trap[neighbour]:
+                self._doors[neighbour] = [
                     random.choice(non_prime_numbers)
-                )
+                    for i in range(1, door_numbers_amount + 1)]
+            else:
+                prime_numbers_amount = random.randint(
+                    min_prime_numbers, max_prime_numbers)
 
+                [self._doors[neighbour].append(random.choice(prime_numbers))
+                    for i in range(1, prime_numbers_amount + 1)]
+                if len(self._doors[neighbour]) < door_numbers_amount:
+                    [self._doors[neighbour].append(random.choice(non_prime_numbers))
+                     for i in range(
+                        len(self._doors[neighbour]), door_numbers_amount + 1)]
 
-# rm = Room((5, 5, 5))
-# prime_numbers = get_prime_numbers()
-# non = get_non_prime_numbers(prime_numbers)
-# nhbrs = {Steps.UP: True, Steps.DOWN: False, Steps.RIGHT: False, Steps.LEFT: True}
-# rm.create_doors(nhbrs, prime_numbers, non)
-# print(rm.get_doors())

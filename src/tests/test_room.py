@@ -3,7 +3,7 @@ import unittest
 import configparser
 from src.room import Room
 from resources.steps import Steps
-from resources.door_numbers import PRIME_NUMBERS, NON_PRIME_NUMBERS
+
 
 config = configparser.ConfigParser()
 config.read('test_config.ini')
@@ -17,11 +17,11 @@ neighbours_rooms_is_traps = {Steps.UP: True, Steps.DOWN: False, Steps.LEFT: True
 class RoomTest(unittest.TestCase):
     """The Main test class. Tests func: create_doors."""
 
-    def test_create_doors(self) -> None:
-        """"""
-        room = Room((LEVEL, X, Y))
-        room.create_doors(neighbours_rooms_is_traps,
-                          PRIME_NUMBERS, NON_PRIME_NUMBERS)
-
-        doors = room.get_doors()
-        doors.
+    # def test_create_doors(self) -> None:
+    #     """"""
+    #     room = Room((LEVEL, X, Y))
+    #     room.create_doors(neighbours_rooms_is_traps,
+    #                       PRIME_NUMBERS, NON_PRIME_NUMBERS)
+    #
+    #     doors = room.get_doors()
+    #     doors.

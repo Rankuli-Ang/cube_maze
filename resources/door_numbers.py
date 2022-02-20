@@ -28,9 +28,7 @@ def get_non_prime_numbers(prime_numbers: list) -> List[int]:
             all_numbers.append(current_number)
             current_number += 1
     return all_numbers
-
-
-PRIME_NUMBERS = get_prime_numbers()
-NON_PRIME_NUMBERS = get_non_prime_numbers(PRIME_NUMBERS)
+# PRIME_NUMBERS = get_prime_numbers()
+# NON_PRIME_NUMBERS = get_non_prime_numbers(PRIME_NUMBERS)
 
 
