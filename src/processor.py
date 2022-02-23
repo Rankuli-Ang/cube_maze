@@ -31,7 +31,7 @@ class Processor:
                           trap_color: Colors, exit_color: Colors,
                           examined_color: Colors, not_examined_color: Colors) -> None:
         """"""
-        self._visualizer = Visualizer(cube_side_pxls, self._cube.get_row(),
+        self._visualizer = Visualizer(cube_side_pxls, self._cube.get_row_length(),
                                       frame_color, player_color,
                                       trap_color, exit_color,
                                       examined_color, not_examined_color)
@@ -48,15 +48,15 @@ class Processor:
         self._cube.create_rooms()
         start_level_index = self._cube.get_random_level_index()
         self._current_level_number = start_level_index
-        self._cube.create_traps_around_start_loc(start_level_index)
+        self._cube.create_traps_around_loc(start_level_index)
 
-        start_loc = self._cube.get_random_safe_room_coords(start_level)
+        start_loc = self._cube.get_random_safe_room_in_level(start_level)
         player_one = Player(start_loc[0], start_loc[1], start_loc[2])
         self._current_player = player_one
         self._players.append(player_one)
 
-        self._cube.add_player_by_coords(start_loc, player_one)
-        start_room = self._cube.get_room_by_cords(start_loc)
+        self._cube.add_player(start_loc, player_one)
+        start_room = self._cube.get_room(start_loc)
         # start_room.create_doors(self._cube.get_neighbour_rooms(start_loc))
 
         self._exit_room_coords = self._cube.create_exit(
@@ -112,7 +112,7 @@ class Processor:
         # elif step == '4':
         #     self._cube.move_player(self._current_player, Steps.DOWN)
         # elif step == '5':
-        #     self._cube.move_player(self._current_player, Steps.UP_LEVEL)
+        #     self._cube.move_player(self._current_player, Steps.UPPER)
         # elif step == '6':
         #     self._cube.move_player(self._current_player, Steps.DOWN_LEVEL)
         #

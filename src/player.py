@@ -1,5 +1,5 @@
 """Contains class Player - main active character."""
-from resources.steps import Steps
+from resources.steps import Steps, step_difference
 
 
 class Player:
@@ -55,24 +55,18 @@ class Player:
         else:
             self._examined_rooms_coords.append(room_coords)
 
-    def explore_room(self, step: Steps, room_is_trap: bool) -> None:  # fix design and add message if room is trap
+    def explore_room(self, step: Steps, room_is_trap: bool) -> None:  # add message if room is trap
         """Adds room coords to list of examined rooms coords,
         if room is a trap, player lose 1 shoe."""
-        self.add_examined_room_coords((
-            self._coords[0] + step.value[0],
-            self._coords[1] + step.value[1],
-            self._coords[2] + step.value[2]
-        ))
+        self.add_examined_room_coords(
+            step_difference(self._coords, step)
+        )
         if room_is_trap:
             self._shoes -= 1
 
     def move(self, step: Steps) -> None:
-        """Changes the player's coordinates to the step value."""  # fix design
-        self._coords = (
-            self._coords[0] + step.value[0],
-            self._coords[1] + step.value[1],
-            self._coords[2] + step.value[2]
-        )
+        """Changes the player's coordinates to the step value."""
+        self._coords = step_difference(self._coords, step)
         self.add_examined_room_coords(self.get_coords())
 
 
