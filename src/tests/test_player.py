@@ -2,7 +2,7 @@
 import configparser
 import unittest
 from src.player import Player
-from resources.steps import Steps
+from resources.steps import Steps, step_difference
 
 config = configparser.ConfigParser()
 config.read('test_config.ini')
@@ -18,9 +18,7 @@ ROOM_COORDS = ROOM_LEVEL, ROOM_X, ROOM_Y
 ROOM_IS_TRAP = config.getboolean('PLAYER_TEST', 'room_is_trap')
 
 STEP = Steps.UP
-EXPLORE_ROOM_COORDS = (PLAYER_COORDS[0] + STEP.value[0],
-                       PLAYER_COORDS[1] + STEP.value[1],
-                       PLAYER_COORDS[2] + STEP.value[2])
+EXPLORE_ROOM_COORDS = step_difference(PLAYER_COORDS, STEP)
 
 
 class PlayerTest(unittest.TestCase):
@@ -42,13 +40,8 @@ class PlayerTest(unittest.TestCase):
     def test_move(self) -> None:
         """Tests changing player's coords to step value."""
         player = Player(PLAYER_COORDS)
-        room_level = player.get_coords()[0] + STEP.value[0]
-        room_x = player.get_coords()[1] + STEP.value[1]
-        room_y = player.get_coords()[2] + STEP.value[2]
-
+        room_coords = step_difference(player.get_coords(), STEP)
         player.move(STEP)
+        self.assertEqual(player.get_coords(), room_coords)
 
-        self.assertEqual(player.get_coords()[0], room_level)
-        self.assertEqual(player.get_coords()[1], room_x)
-        self.assertEqual(player.get_coords()[2], room_y)
 
