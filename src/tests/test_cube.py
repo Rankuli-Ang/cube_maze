@@ -8,8 +8,8 @@ from resources.steps import Steps, step_difference
 
 config = configparser.ConfigParser()
 config.read('test_config.ini')
-ROW = config.getint('TEST_CUBE', 'row')
-DIFFICULTY_COEFFICIENT = config.getfloat('TEST_CUBE', 'difficult_coefficient')
+ROW = config.getint('CUBE_TEST', 'row')
+DIFFICULTY_COEFFICIENT = config.getfloat('CUBE_TEST', 'difficult_coefficient')
 RANDOM_INDEX = random.randrange(0, ROW)
 
 ROOM_COORDS = 0, 0, 0

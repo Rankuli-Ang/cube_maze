@@ -1,5 +1,4 @@
-""""""
-from flask_sqlalchemy import SQLAlchemy
+"""Module contains class Processor."""
 import random
 from src.cube import Cube
 from src.player import Player
@@ -15,7 +14,6 @@ class Processor:
     def __init__(self):
         self._cube = None
         self._visualizer = None
-        self._players: list = []
         self._current_level_number = None
         self._current_player = None
         self._exit_room_coords = None
