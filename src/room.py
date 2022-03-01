@@ -23,10 +23,7 @@ class Room:
         self._players: list = []
         self._doors: dict = {}
         self._trap: bool = False
-        # to add types of traps
         self._exit: bool = False
-        # self._processed = False
-        # resolve border rooms nuances
 
     def get_coords(self) -> tuple:
         """Gets room's coordinates in tuple(level, x, y)."""

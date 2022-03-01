@@ -54,23 +54,20 @@ class Visualizer:
             for point in range(0, self._cube_side_pxls):
                 visualization[point][start_point] = self._frame_color
 
-    def draw_room(self, visualization, coords: tuple, room_status: dict) -> None:
+    def draw_room(self, visualization, coords: tuple, room_status: Colors) -> None:
         """"""
-        for color in room_status:
-            if room_status[color] is True:
-                for y in range(
-                        (self._rooms_coordinates[2] + 1),
-                        (self._rooms_coordinates[2] + self._room_side_pxls)
-                ):
-                    for x in range(
-                            (self._rooms_coordinates[1] + 1),
-                            (self._rooms_coordinates[1] + self._room_side_pxls)
-                    ):
-                        visualization[y][x] = color
-                return
+        start_x = self._rooms_coordinates[coords[2]][coords[1]][1]
+        start_y = self._rooms_coordinates[coords[2]][coords[1]][0]
 
-
-
+        for y in range(
+                start_y,
+                (start_y + self._room_side_pxls)
+        ):
+            for x in range(
+                    start_x,
+                    (start_x + self._room_side_pxls)
+            ):
+                visualization[y][x] = room_status.value
 
         # step = int((self._cube_side_pxls / self._cube_row))  # need to change
         #
@@ -95,25 +92,33 @@ class Visualizer:
         #     cur_x += 1
         #     cur_y = room_coordinates[0]
 
-    def visualize(self, cube_level_instance: list,
-                  player: Player) -> None:
+    def visualize(self, room_statuses: list) -> None:  # fix the naming
         """"""
         visualization = np.zeros((self._cube_side_pxls, self._cube_side_pxls, 3), dtype='uint8')
 
-        self.draw_frame(visualization)
-        row_number = 0
-        room_number = 0
-        while row_number < self._cube_row:
-            while room_number < self._cube_row:
-                self.draw_room(visualization,
-                               self._rooms_coordinates[row_number][room_number],
-                               cube_level_instance[row_number][room_number].is_player_here,
-                               cube_level_instance[row_number][room_number].is_exit,
-                               cube_level_instance[row_number][room_number].is_trap,
-                               cube_level_instance[row_number][room_number].is_examined(player))
-                room_number += 1
-            row_number += 1
-            room_number = 0
+        for row in room_statuses:
+            for room in room_statuses:
+                self.draw_room(visualization, room[0], room[1])
+
+        # for row in cube_level:
+        #
+        # self.draw_frame(visualization)
+        # for row in self._rooms_coordinates:
+        #     for room in row:
+
+        # row_number = 0
+        # room_number = 0
+        # while row_number < self._cube_row:
+        #     while room_number < self._cube_row:
+        #         self.draw_room(visualization,
+        #                        self._rooms_coordinates[row_number][room_number],
+        #                        cube_level_instance[row_number][room_number].is_player_here,
+        #                        cube_level_instance[row_number][room_number].is_exit,
+        #                        cube_level_instance[row_number][room_number].is_trap,
+        #                        cube_level_instance[row_number][room_number].is_examined(player))
+        #         room_number += 1
+        #     row_number += 1
+        #     room_number = 0
         scale = 2
         vis_image = cv2.resize(visualization, None, fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
         cv2.imwrite('vis.png', vis_image)  # fix for more images
