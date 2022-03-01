@@ -1,4 +1,4 @@
-""""""
+"""Module contains class Visualizer."""
 import numpy as np
 import cv2
 from resources.colors import Colors
@@ -7,112 +7,129 @@ from src.player import Player
 
 
 class Visualizer:
-    """"""
+    """Visualize game playing field.
+    Player can see its current location on the field,
+    examined and not examined rooms,
+    trap rooms if player explore its."""
 
-    def __init__(self, cube_side_pxls: int, cube_row: int,
-                 frame_color: Colors, player_color: Colors,
-                 trap_color: Colors, exit_color: Colors,
-                 examined_color: Colors, not_examined_color: Colors):
-        self._cube_side_pxls: int = cube_side_pxls
+    def __init__(self, cube_row: int):
+        self._frame_color: tuple = Colors.FRAME_COLOR.value
+        self._player_color: tuple = Colors.PLAYER_COLOR.value
+        self._trap_color: tuple = Colors.TRAP_COLOR.value
+        self._exit_color: tuple = Colors.EXIT_COLOR.value
+        self._examined_color: tuple = Colors.EXAMINED_COLOR.value
+        self._not_examined_color: tuple = Colors.NOT_EXAMINED_COLOR.value
+
+        self._cube_side_pxls: int = 0
+        self._room_side_pxls: int = 0
+        self._scale = 0
         self._cube_row: int = cube_row
-
-        self._frame_color: tuple = frame_color.value
-        self._player_color: tuple = player_color.value
-        self._trap_color: tuple = trap_color.value
-        self._exit_color: tuple = exit_color.value
-        self._examined_color: tuple = examined_color.value
-        self._not_examined_color: tuple = not_examined_color.value
-
         self._rooms_coordinates: list = []
 
-    def set_rooms(self) -> None:
-        """"""
-        step_width = int((self._cube_side_pxls / self._cube_row))
-        step_height = int((self._cube_side_pxls / self._cube_row))
-        cur_width = 0
+    def set_visualization(self, room_side_pxls: int, scale: int) -> None:
+        """Sets room side and cube side in pixels on the visualization."""
+        self._room_side_pxls = room_side_pxls
+        self._cube_side_pxls = self._room_side_pxls * self._cube_row
+        self._scale = scale
 
-        while cur_width < self._cube_side_pxls:
-            cur_height = 0
-            new_level = []
-            while cur_height < self._cube_side_pxls:
-                start_room_point = cur_width, cur_height
-                new_level.append(start_room_point)
-                cur_height += step_height
-            cur_width += step_width
-            self._rooms_coordinates.append(new_level)
+    def set_rooms(self) -> None:
+        """Sets start point of the rooms on the visualization."""
+        for y in range(0, self._cube_side_pxls, self._room_side_pxls):
+            row = []
+            for x in range(0, self._cube_side_pxls, self._room_side_pxls):
+                start_room_point = y, x
+                row.append(start_room_point)
+            self._rooms_coordinates.append(row)
 
     def draw_frame(self, visualization) -> None:
+        """Draws frames between rooms."""
+
+        """Vertical frame."""
+        for start_point in range(0, self._cube_side_pxls, self._room_side_pxls):
+            for point in range(0, self._cube_side_pxls):
+                visualization[start_point][point] = self._frame_color
+
+        """Horizontal frame."""
+        for start_point in range(0, self._cube_side_pxls, self._room_side_pxls):
+            for point in range(0, self._cube_side_pxls):
+                visualization[point][start_point] = self._frame_color
+
+    def draw_room(self, visualization, coords: tuple, room_status: Colors) -> None:
         """"""
-        step_width = int((self._cube_side_pxls / self._cube_row))
-        step_height = int((self._cube_side_pxls / self._cube_row))
+        start_x = self._rooms_coordinates[coords[2]][coords[1]][1]
+        start_y = self._rooms_coordinates[coords[2]][coords[1]][0]
 
-        """vertical frame"""
-        cur_height = step_height
+        for y in range(
+                start_y,
+                (start_y + self._room_side_pxls)
+        ):
+            for x in range(
+                    start_x,
+                    (start_x + self._room_side_pxls)
+            ):
+                visualization[y][x] = room_status.value
 
-        while cur_height < self._cube_side_pxls:
-            cur_counter = 0
-            while cur_counter < self._cube_side_pxls:
-                visualization[cur_counter][cur_height] = self._frame_color
-                cur_counter += 1
-            cur_height += step_height
+        # step = int((self._cube_side_pxls / self._cube_row))  # need to change
+        #
+        # # cv2.floodFill(visualization, None, seedPoint=room_coordinates, newVal=self._trap_color)
+        # cur_x = room_coordinates[1]
+        # cur_y = room_coordinates[0]
+        # limit_x = cur_x + int((self._cube_side_pxls / self._cube_row)) - 1
+        # limit_y = cur_y + int((self._cube_side_pxls / self._cube_row)) - 1
+        # while cur_x < limit_x:
+        #     while cur_y < limit_y:
+        #         if player:
+        #             visualization[cur_y][cur_x] = self._player_color
+        #         elif exit_room:
+        #             visualization[cur_y][cur_x] = self._exit_color
+        #         elif trap:
+        #             visualization[cur_y][cur_x] = self._trap_color
+        #         elif examined:
+        #             visualization[cur_y][cur_x] = self._examined_color
+        #         else:
+        #             visualization[cur_y][cur_x] = self._not_examined_color  # customize color options
+        #         cur_y += 1
+        #     cur_x += 1
+        #     cur_y = room_coordinates[0]
 
-        """horizontal frame"""
-        cur_width = step_width
-
-        while cur_width < self._cube_side_pxls:
-            cur_counter = 0
-            while cur_counter < self._cube_side_pxls:
-                visualization[cur_width][cur_counter] = self._frame_color
-                cur_counter += 1
-            cur_width += step_width
-
-    def draw_room(self, visualization,
-                  room_coordinates: tuple, player: bool, exit_room: bool, trap: bool, examined: bool) -> None:
-        """"""
-        step = int((self._cube_side_pxls / self._cube_row))  # need to change
-
-        # cv2.floodFill(visualization, None, seedPoint=room_coordinates, newVal=self._trap_color)
-        cur_x = room_coordinates[1]
-        cur_y = room_coordinates[0]
-        limit_x = cur_x + int((self._cube_side_pxls / self._cube_row)) - 1
-        limit_y = cur_y + int((self._cube_side_pxls / self._cube_row)) - 1
-        while cur_x < limit_x:
-            while cur_y < limit_y:
-                if player:
-                    visualization[cur_y][cur_x] = self._player_color
-                elif exit_room:
-                    visualization[cur_y][cur_x] = self._exit_color
-                elif trap:
-                    visualization[cur_y][cur_x] = self._trap_color
-                elif examined:
-                    visualization[cur_y][cur_x] = self._examined_color
-                else:
-                    visualization[cur_y][cur_x] = self._not_examined_color  # customize color options
-                cur_y += 1
-            cur_x += 1
-            cur_y = room_coordinates[0]
-
-    def visualize(self, cube_level_instance: list,
-                  player: Player) -> None:
+    def visualize(self, room_statuses: list) -> None:  # fix the naming
         """"""
         visualization = np.zeros((self._cube_side_pxls, self._cube_side_pxls, 3), dtype='uint8')
 
-        self.draw_frame(visualization)
-        row_number = 0
-        room_number = 0
-        while row_number < self._cube_row:
-            while room_number < self._cube_row:
-                self.draw_room(visualization,
-                               self._rooms_coordinates[row_number][room_number],
-                               cube_level_instance[row_number][room_number].is_player_here,
-                               cube_level_instance[row_number][room_number].is_exit,
-                               cube_level_instance[row_number][room_number].is_trap,
-                               cube_level_instance[row_number][room_number].is_examined(player))
-                room_number += 1
-            row_number += 1
-            room_number = 0
+        for row in room_statuses:
+            for room in room_statuses:
+                self.draw_room(visualization, room[0], room[1])
+
+        # for row in cube_level:
+        #
+        # self.draw_frame(visualization)
+        # for row in self._rooms_coordinates:
+        #     for room in row:
+
+        # row_number = 0
+        # room_number = 0
+        # while row_number < self._cube_row:
+        #     while room_number < self._cube_row:
+        #         self.draw_room(visualization,
+        #                        self._rooms_coordinates[row_number][room_number],
+        #                        cube_level_instance[row_number][room_number].is_player_here,
+        #                        cube_level_instance[row_number][room_number].is_exit,
+        #                        cube_level_instance[row_number][room_number].is_trap,
+        #                        cube_level_instance[row_number][room_number].is_examined(player))
+        #         room_number += 1
+        #     row_number += 1
+        #     room_number = 0
         scale = 2
         vis_image = cv2.resize(visualization, None, fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
         cv2.imwrite('vis.png', vis_image)  # fix for more images
+        cv2.imshow('vis', vis_image)
+        cv2.waitKey()
+
+    def vis_test(self, coords, room_status):  # delete after all testing
+        visualization = np.zeros((self._cube_side_pxls, self._cube_side_pxls, 3), dtype='uint8')
+        self.draw_frame(visualization)
+        self.draw_room(visualization, coords, room_status)
+        scale = 2
+        vis_image = cv2.resize(visualization, None, fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
         cv2.imshow('vis', vis_image)
         cv2.waitKey()

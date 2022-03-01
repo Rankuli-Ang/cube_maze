@@ -17,7 +17,7 @@ class Cube:
         self._border_index: int = self._row_length - 1
         self._square: int = self._row_length * self._row_length
         self._difficulty: int = int(self._square * difficulty_coefficient)
-        self._exit: tuple or None = None
+        self._exit: tuple = 0, 0, 0
         self._levels: list = []
         self._generated_levels_indexes: list = []
 
@@ -131,6 +131,7 @@ class Cube:
         """Adds player in the room's list."""
         coords = player.get_coords()
         self._levels[coords[0]][coords[2]][coords[1]].add_player(player)
+        self.create_traps_around_loc(coords[0])
 
     def move_player(self, player: Player, step: Steps) -> None:
         """Moves player to the next room by step value
@@ -140,4 +141,11 @@ class Cube:
         self.get_room(player.get_coords()).add_player(player)
         if step == Steps.UPPER or step == Steps.UNDER:
             self.create_traps_around_loc(player.get_coords()[0])
+
+    """Cube Initialization."""
+
+    def initialization(self) -> None:  # maybe create traps in all level at the beginning
+        """"""
+        self.create_rooms()
+        self.create_exit()
 
