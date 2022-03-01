@@ -55,81 +55,31 @@ class Visualizer:
                 visualization[point][start_point] = self._frame_color
 
     def draw_room(self, visualization, coords: tuple, room_status: Colors) -> None:
-        """"""
+        """Draws room with a given Color."""
         start_x = self._rooms_coordinates[coords[2]][coords[1]][1]
         start_y = self._rooms_coordinates[coords[2]][coords[1]][0]
 
         for y in range(
                 start_y,
-                (start_y + self._room_side_pxls)
+                (start_y + self._room_side_pxls - 1)
         ):
             for x in range(
                     start_x,
-                    (start_x + self._room_side_pxls)
+                    (start_x + self._room_side_pxls - 1)
             ):
                 visualization[y][x] = room_status.value
 
-        # step = int((self._cube_side_pxls / self._cube_row))  # need to change
-        #
-        # # cv2.floodFill(visualization, None, seedPoint=room_coordinates, newVal=self._trap_color)
-        # cur_x = room_coordinates[1]
-        # cur_y = room_coordinates[0]
-        # limit_x = cur_x + int((self._cube_side_pxls / self._cube_row)) - 1
-        # limit_y = cur_y + int((self._cube_side_pxls / self._cube_row)) - 1
-        # while cur_x < limit_x:
-        #     while cur_y < limit_y:
-        #         if player:
-        #             visualization[cur_y][cur_x] = self._player_color
-        #         elif exit_room:
-        #             visualization[cur_y][cur_x] = self._exit_color
-        #         elif trap:
-        #             visualization[cur_y][cur_x] = self._trap_color
-        #         elif examined:
-        #             visualization[cur_y][cur_x] = self._examined_color
-        #         else:
-        #             visualization[cur_y][cur_x] = self._not_examined_color  # customize color options
-        #         cur_y += 1
-        #     cur_x += 1
-        #     cur_y = room_coordinates[0]
-
-    def visualize(self, room_statuses: list) -> None:  # fix the naming
-        """"""
-        visualization = np.zeros((self._cube_side_pxls, self._cube_side_pxls, 3), dtype='uint8')
-
-        for row in room_statuses:
-            for room in room_statuses:
-                self.draw_room(visualization, room[0], room[1])
-
-        # for row in cube_level:
-        #
-        # self.draw_frame(visualization)
-        # for row in self._rooms_coordinates:
-        #     for room in row:
-
-        # row_number = 0
-        # room_number = 0
-        # while row_number < self._cube_row:
-        #     while room_number < self._cube_row:
-        #         self.draw_room(visualization,
-        #                        self._rooms_coordinates[row_number][room_number],
-        #                        cube_level_instance[row_number][room_number].is_player_here,
-        #                        cube_level_instance[row_number][room_number].is_exit,
-        #                        cube_level_instance[row_number][room_number].is_trap,
-        #                        cube_level_instance[row_number][room_number].is_examined(player))
-        #         room_number += 1
-        #     row_number += 1
-        #     room_number = 0
-        scale = 2
-        vis_image = cv2.resize(visualization, None, fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
-        cv2.imwrite('vis.png', vis_image)  # fix for more images
-        cv2.imshow('vis', vis_image)
-        cv2.waitKey()
-
-    def vis_test(self, coords, room_status):  # delete after all testing
+    def visualize(self, room_statuses: dict) -> None:
+        """Visualizes game field."""
         visualization = np.zeros((self._cube_side_pxls, self._cube_side_pxls, 3), dtype='uint8')
         self.draw_frame(visualization)
-        self.draw_room(visualization, coords, room_status)
-        scale = 2
-        vis_image = cv2.resize(visualization, None, fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
+        for room in room_statuses:
+            self.draw_room(visualization, room, room_statuses[room])
+
+        vis_image = cv2.resize(visualization, None,
+                               fx=self._scale, fy=self._scale,
+                               interpolation=cv2.INTER_NEAREST)
+        cv2.imwrite('vis.png', vis_image)
         cv2.imshow('vis', vis_image)
         cv2.waitKey()
+

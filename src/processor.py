@@ -18,12 +18,12 @@ class Processor:
         self._current_player = None  # temporary solution
         self._current_level_number = None  # temporary solution
         self._exit_room_coords = None
-        self._stats = None
-        self._is_activated = False
+        # self._stats = None
+        # self._is_activated = False
 
-    def activate(self) -> None:
-        """Changes is_activated status to True."""
-        self._is_activated = True
+    # def activate(self) -> None:
+    #     """Changes is_activated status to True."""
+    #     self._is_activated = True
 
     def create_visualizer(self,
                           cube_row: int, room_side_pxls: int,
@@ -40,7 +40,6 @@ class Processor:
         self._cube = Cube(row_length, difficulty_coefficient)
         self._cube.create_rooms()
         start_level = self._cube.get_random_level_index()
-        print(start_level)
         self._cube.create_traps_on_level(start_level)
         start_room_coords = self._cube.get_random_safe_room_in_level(start_level)
         player_one = Player(start_room_coords)
@@ -53,67 +52,37 @@ class Processor:
         self._cube._exit = exit_room_coords
         self._exit_room_coords = exit_room_coords
 
-    def get_room_statuses(self) -> list:
+    def get_rooms_statuses(self) -> dict:
         """"""
-        all_examined_rooms_coords = self._current_player.get_examined_rooms()
-        current_level_examined_rooms_coords = []
-        for room in all_examined_rooms_coords:
-            if room[0] == self._current_player.get_coords()[0]:
-                current_level_examined_rooms_coords.append(room)
+        current_level_room_statuses = {
+            self._current_player.get_coords(): Colors.PLAYER_COLOR
+        }
 
-        current_level_room_statuses = []
+        all_examined_rooms_coords = self._current_player.get_examined_rooms()
+        current_level_index = self._current_player.get_coords()[0]
+
+        for room_coords in all_examined_rooms_coords:
+            if room_coords[0] == current_level_index:
+                if self._cube.get_room(room_coords).is_trap:
+                    current_level_room_statuses[room_coords] = Colors.TRAP_COLOR
+                else:
+                    if room_coords not in current_level_room_statuses:
+                        current_level_room_statuses[room_coords] = Colors.EXAMINED_COLOR
+
+        if self._exit_room_coords[0] == current_level_index:
+            current_level_room_statuses[self._exit_room_coords] = Colors.EXIT_COLOR
+
+        rooms_without_not_examined = current_level_room_statuses.keys()
+
         current_level = self._cube.get_level(self._current_player.get_coords()[0])
         for row in current_level:
-            current_row = []
             for room in row:
                 room_coords = room.get_coords()
-                if room_coords == self._current_player.get_coords():
-                    current_row.append((room_coords, Colors.PLAYER_COLOR))
-                elif room_coords == self._exit_room_coords:
-                    current_row.append((room_coords, Colors.EXIT_COLOR))
-                elif room_coords in current_level_examined_rooms_coords:
-                    if room.is_trap:
-                        current_row.append((room_coords, Colors.TRAP_COLOR))
-                    else:
-                        current_row.append((room_coords, Colors.EXAMINED_COLOR))
-                else:
-                    current_row.append((room_coords, Colors.NOT_EXAMINED_COLOR))
-            current_level_room_statuses.append(current_row)
+                if room_coords not in rooms_without_not_examined:
+                    current_level_room_statuses[room_coords] = Colors.NOT_EXAMINED_COLOR
+
         return current_level_room_statuses
 
-
-    # def new_game(
-    #         self, cube_row: int, difficulty_level: int, cube_side_pxls: int,
-    #         frame_color: Colors, player_color: Colors, trap_color: Colors,
-    #         exit_color: Colors, examined_color: Colors, not_examined_color: Colors
-    # ) -> None:  # create cube, 3 levels, player
-    #     # i doubt the design of this function
-    #     """"""
-    #     self._cube = Cube(cube_row, difficulty_level)
-    #     self._cube.create_rooms()
-    #     start_level_index = self._cube.get_random_level_index()
-    #     self._current_level_number = start_level_index
-    #     self._cube.create_traps_around_loc(start_level_index)
-    #
-    #     start_loc = self._cube.get_random_safe_room_in_level(start_level)
-    #     player_one = Player(start_loc[0], start_loc[1], start_loc[2])
-    #     self._current_player = player_one
-    #     self._players.append(player_one)
-    #
-    #     self._cube.add_player(start_loc, player_one)
-    #     start_room = self._cube.get_room(start_loc)
-    #     # start_room.create_doors(self._cube.get_neighbour_rooms(start_loc))
-    #
-    #     self._exit_room_coords = self._cube.create_exit(
-    #         self._cube.get_level(self._current_level_number)
-    #     )
-    #
-    #     self._stats = Statistics()
-    #     self.create_visualizer(
-    #         cube_side_pxls, frame_color, player_color,
-    #         trap_color, exit_color, examined_color, not_examined_color
-    #     )
-    #     self.activate()
     #
     # # def explore_room(self, player: Player, step: Steps) -> None:
     # #     """"""
@@ -142,27 +111,26 @@ class Processor:
     # def get_player(self):
     #     return self._players[0]
     #
-    # def process(self) -> None:  # temporary test solution
-    #     """"""
-    #     self._visualizer.visualize(self._cube.get_level(self._current_level_number),
-    #                                self._current_player)
-    #
-    #     # step = input("next step")
-    #     # if step == '1':
-    #     #     self._cube.move_player(self._current_player, Steps.UP)
-    #     # elif step == '2':
-    #     #     self._cube.move_player(self._current_player, Steps.LEFT)
-    #     # elif step == '3':
-    #     #     self._cube.move_player(self._current_player, Steps.RIGHT)
-    #     # elif step == '4':
-    #     #     self._cube.move_player(self._current_player, Steps.DOWN)
-    #     # elif step == '5':
-    #     #     self._cube.move_player(self._current_player, Steps.UPPER)
-    #     # elif step == '6':
-    #     #     self._cube.move_player(self._current_player, Steps.DOWN_LEVEL)
-    #     #
-    #     # self._stats.add_step()
-    #     # pl_coords = self._current_player.get_coords()
-    #     # self._current_level_number = pl_coords[0]
-    #     # self._cube.get_neighbour_rooms(pl_coords)
-    #     # return self.is_end_game
+    def process(self) -> None:  # temporary test solution
+        """"""
+
+
+        step = input("next step")
+        if step == '1':
+            self._cube.move_player(self._current_player, Steps.UP)
+        elif step == '2':
+            self._cube.move_player(self._current_player, Steps.LEFT)
+        elif step == '3':
+            self._cube.move_player(self._current_player, Steps.RIGHT)
+        elif step == '4':
+            self._cube.move_player(self._current_player, Steps.DOWN)
+        elif step == '5':
+            self._cube.move_player(self._current_player, Steps.UPPER)
+        elif step == '6':
+            self._cube.move_player(self._current_player, Steps.DOWN_LEVEL)
+
+        map_status = self.get_rooms_statuses()
+        self._visualizer.visualize(map_status)
+
+
+

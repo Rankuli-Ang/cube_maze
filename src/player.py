@@ -66,7 +66,9 @@ class Player:
 
     def move(self, step: Steps) -> None:
         """Changes the player's coordinates to the step value."""
+        print('pl coord', self._coords)
         self._coords = step_difference(self._coords, step)
+        print('pl coord after', self._coords)
         self.add_examined_room_coords(self.get_coords())
 
 
